@@ -15,8 +15,8 @@ const UserForm = ({ title, initialUserData = "", edit = false, submitHandler = (
     }
 
     return (
-        <div className='w-full h-[90vh] flex flex-col justify-center'>
-            <div className='absolute top-6 text-sm text-gray-600 cursor-pointer' onClick={goBackHandler}>Go Back</div>
+        <div className='w-full mt-4 my-3 flex flex-col justify-center'>
+            <div className='absolute sm:right-14 right-6 top-6 text-sm text-gray-600 cursor-pointer' onClick={goBackHandler}>Go Back</div>
             <h3 className='text-base text-gray-700 font-semibold mb-4 mt-3'>{title}</h3>
             <form className='flex flex-col gap-4' onSubmit={(e) => {
                 e.preventDefault();

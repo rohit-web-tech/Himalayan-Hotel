@@ -66,7 +66,7 @@ const Contact = () => {
     }
 
     return (
-        <div className='px-14 w-[calc(100%-300px)] h-[90vh] flex flex-col justify-center'>
+        <div className='sm:px-14 px-6 mt-4 w-full md:w-[calc(100%-300px)]  mb-3 flex flex-col justify-center'>
             <h3 className='text-base text-gray-700 font-semibold mb-2 mt-3'>Contact</h3>
             <form className='flex flex-col gap-3' onSubmit={(e) => {
                 e.preventDefault();

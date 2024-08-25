@@ -63,7 +63,7 @@ const About = () => {
     }
 
     return (
-        <div className='px-14 w-[calc(100%-300px)] h-[90vh] flex flex-col justify-center'>
+        <div className='sm:px-14 px-6 mb-3 mt-4 w-full md:w-[calc(100%-300px)]  flex flex-col justify-center'>
             <h3 className='text-base text-gray-700 font-semibold mb-2 mt-3'>About</h3>
             <form className='flex flex-col gap-2' onSubmit={(e) => {
                 e.preventDefault();

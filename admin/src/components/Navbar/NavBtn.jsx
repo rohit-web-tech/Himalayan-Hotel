@@ -1,12 +1,13 @@
 import { NavLink } from 'react-router-dom'
 
-const NavBtn = ({to,children}) => {
+const NavBtn = ({ to, children, handleClick = () => { } }) => {
     return (
         <NavLink
             className={({ isActive }) => (
                 ` ${isActive ? "font-bold bg-gray-800" : "bg-gray-600"} py-1 hover:bg-gray-800 hover:cursor-pointer w-44 block text-sm rounded-md text-center`
             )}
             to={to}
+            onClick={handleClick}
         >{children}</NavLink>
     )
 }

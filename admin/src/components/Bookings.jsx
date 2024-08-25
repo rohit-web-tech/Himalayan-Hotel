@@ -56,7 +56,7 @@ const Bookings = () => {
     }
 
     return (
-        <div className='flex flex-col w-[calc(100%-300px)] px-14 py-3'>
+        <div className='flex flex-col  w-full md:w-[calc(100%-300px)] sm:px-14 px-6 py-3'>
             <h2 className='text-gray-900 font-bold text-xl h-[70px] flex items-center'>Bookings</h2>
             <Table tableFields={tableFeilds} tableRows={rowData} />
 

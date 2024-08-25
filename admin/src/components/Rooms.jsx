@@ -144,7 +144,7 @@ const Rooms = () => {
     }
 
     return (
-        <div className='flex flex-col w-[calc(100%-300px)] px-14 py-3'>
+        <div className='flex flex-col  w-full md:w-[calc(100%-300px)]  min-h-screen sm:px-14 px-6 py-3'>
             {
                 !showForm ? (
                     <>

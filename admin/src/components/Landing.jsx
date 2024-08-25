@@ -3,7 +3,7 @@ import image from "../assets/admin.jpg"
 
 const Landing = () => {
   return (
-    <div className='flex flex-col items-center justify-center w-[calc(100%-300px)]'>
+    <div className='flex flex-col items-center justify-center  w-full md:w-[calc(100%-300px)] '>
       <img
         src={image}
         className='h-96'

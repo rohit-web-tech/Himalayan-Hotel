@@ -17,8 +17,8 @@ const RoomForm = ({ title, initialUserData = "", edit = false, submitHandler = (
     }
 
     return (
-        <div className='w-full h-[90vh] flex flex-col justify-center'>
-            <div className='absolute top-4 text-sm text-gray-600 cursor-pointer right-14' onClick={goBackHandler}>Go Back</div>
+        <div className='w-full  mt-4 flex flex-col justify-center'>
+            <div className='absolute top-4 text-sm text-gray-600 cursor-pointer sm:right-14 right-6' onClick={goBackHandler}>Go Back</div>
             <h3 className='text-base text-gray-700 font-semibold mb-2 mt-3'>{title}</h3>
             <form className='flex flex-col gap-3' onSubmit={(e) => {
                 e.preventDefault();

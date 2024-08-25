@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 const PageNotFound = ({type=""}) => {
     const navigate = useNavigate();
     return (
-        <div className={`py-6 flex flex-col items-center justify-center ${type==="login" ? "w-[calc(100%-300px)]" : "w-full" }`}>
+        <div className={`py-6 flex flex-col items-center justify-center ${type==="login" ? " w-full md:w-[calc(100%-300px)] " : "w-full" }`}>
             <img
                 className="h-96"
                 src={image}

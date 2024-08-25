@@ -4,12 +4,13 @@ import Navbar from '../Navbar/Navbar';
 
 const ProtectedRoutes = () => {
     const loggedInUser = JSON.parse(localStorage.getItem("akhoteladmin"));
-    const auth = loggedInUser ? true : false ;
+    const auth = loggedInUser ? true : false;
     return (
         !auth ? <Navigate to="/login" /> : (
-            <div className='flex'>
-            <Navbar />
-            <Outlet />
+            <div className='flex items-start'>
+                <Navbar />
+                <div className='md:w-[300px]'></div>
+                <Outlet />
             </div>
         )
     );
