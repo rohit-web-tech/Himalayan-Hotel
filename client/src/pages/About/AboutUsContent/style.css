@@ -1,0 +1,51 @@
+#element-card{
+    width : 100% ;
+    position : relative ;
+    padding : 30px 0px ;
+}
+.element-card{
+    width : 100% ;
+    display : grid ;
+    grid-template-columns: repeat(auto-fit,minmax(350px,1fr));
+    gap : 30px ;
+}
+.element-card .image{
+    width : 100%; 
+    height : auto ;
+    position : relative ;
+}
+.element-card .image{
+    height :100%;
+    width : 100% ;
+    position: relative ;
+}
+.image .lazy-load-image-background{
+    height :100%;
+    width : 100% ;
+    position: relative ;
+}
+.image .lazy-load-image-background img{
+    height : 100% ;
+    width : 100% ;
+}
+.element-content{
+    gap:20px ;
+}
+.element-content h1{
+    font-size: 35px ;
+    font-weight: bolder ;
+}
+.about-us{
+    text-align: justify;
+}
+@media (max-width:640px) {
+    .element-content h1{
+        font-size: 30px ;
+        font-weight: bolder ;
+    }
+}
+@media (max-width:400px) {
+    .element-card{
+        grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    }
+}

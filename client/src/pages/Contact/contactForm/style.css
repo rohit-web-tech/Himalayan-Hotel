@@ -1,0 +1,65 @@
+#contact-us-form{
+    width : 100% ;
+    margin : 20px 0px;
+    position : relative ;
+}
+.contact-us-form{
+    width : 100% ;
+    padding : 50px ;
+    border : 2px solid rgba(128, 128, 128, 0.596);
+    justify-content: space-between;
+    align-items: start;
+    gap : 30px ;
+    border-radius: 5px ;
+}
+.contact-us-form p{
+    font-size: 12px ;
+}
+
+.contact-form{
+    gap : 10px ;
+    width : 100% ;
+}
+.contact-form form{
+    width: 100% ;
+    gap : 20px ;
+}
+.contact-form form .contact-form-input-box{
+    width : 100% ;
+    height : 35px ;
+    padding-left: 8px ;
+    font-weight: 600;
+    border : none ;
+    border-radius: 5px ;
+    border:2px solid rgba(128, 128, 128, 0.596);
+} 
+.contact-form form #user-message{
+    padding-top: 8px ;
+    height : 120px ;
+}
+.contact-form form #message-submission {
+    width : 100% ;
+    height : 35px ;
+    background-color: var(--primary-color);
+    border : none ;
+    color : white ;
+    font-weight: bolder;
+    border-radius: 10px ;
+    transition: background-color ease .4s;
+}
+.contact-form form #message-submission:hover{
+    cursor : pointer ;
+    background-color : rgb(158, 158, 158);
+}
+@media (max-width:685px) {
+    .contact-us-form{
+        flex-direction: column;
+        gap : 50px ;
+    }
+    .contact-form{
+        width : 100% ;
+    }
+    .contact-us-form{
+        padding : 50px 20px;
+    }
+}

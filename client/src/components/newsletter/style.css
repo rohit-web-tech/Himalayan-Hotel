@@ -1,0 +1,80 @@
+.justify-center{
+    justify-content: center ;
+}
+.flex-column{
+    flex-direction: column;
+}
+.align-center{
+    align-items: center ;
+}
+.flex-box{
+    display: flex ;
+}
+#news-container{
+    width : 100% ;
+    min-height : 130px ;
+    padding : 30px 0px ;
+    background-color: var(--primary-color) ;
+    position: relative;
+}
+.news-container{
+    width : 100% ;
+    justify-content: space-between;
+    color : white ;
+}
+.golden{
+    color : goldenrod ;
+}
+.news-container #email-get .email-input{
+    width : 300px ;
+    height :  40px ;
+    padding-left : 10px ; 
+    border : none ;
+    outline: none;
+    z-index : 50 ;
+    color :  var(--primary-color) ;
+    font-size: 14px ;
+}
+.email-signup-btn{
+    height :  40px ;
+    width : 80px;
+    font-weight: 600;
+    border : none ;
+    background-color: var(--main-theme);
+    color : white ;
+    font-size: 14px ;
+}
+.news-text{
+    gap : 10px ;
+    align-items: start;
+}
+.news-text h3{
+    font-weight: 600 ;
+    font-size: 20px;
+}
+.news-text h6{
+    font-size: 14px;
+}
+@media (max-width : 835px){
+    .news-container{
+        flex-direction: column;
+        gap : 30px ;
+    }
+    .news-text{
+        align-items: center ;
+        text-align: center;
+    }
+}
+@media (max-width : 422px){
+    .news-container #email-get .email-input{
+        width : 200px ;
+    }
+    .news-container #email-get .email-signup-btn{
+        width : 70px ;
+    }
+}
+@media (max-width : 300px){
+    .news-container #email-get .email-input{
+        width : 170px ;
+    }
+}

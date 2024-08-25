@@ -1,0 +1,26 @@
+#element-card{
+    margin: 50px 0px ; 
+    width : 100% ;
+    position : relative ;
+}
+.element-card{
+    width : 100% ;
+    display : grid ;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap : 30px ;
+}
+.element-card .image{
+    width : 100%; 
+    height : auto ;
+    position : relative ;
+}
+.element-card .image img{
+    height :100%;
+    width : 100% ;
+}
+.element-content{
+    gap:20px ;
+}
+.about-us{
+    text-align: justify;
+}

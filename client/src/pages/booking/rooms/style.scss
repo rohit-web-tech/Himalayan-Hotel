@@ -1,0 +1,68 @@
+#room-container{
+    position: relative ;
+    background-color:white ;
+    border-radius: 10px ;
+    box-shadow: 0px 0px 8px rgb(28, 28, 28) ;
+    .room-image{
+        height : 200px ;
+        width : 100% ;
+        position: relative;
+        .lazy-load-image-background{
+            height : 100% ;
+            width : 100% ;
+            position: relative;
+            img{
+                border-radius: 10px 10px 0px 0px ;
+                height : 200px ;
+                width : 100% ;
+                object-fit: cover;
+                object-position: center ;
+            }
+        }
+    }
+    .room-description{
+        padding : 20px 10px ;
+        .room-name p{
+            font-size: 20px ;
+            color : var(--primary-color) ;
+        }
+        .room-price-and-maxcount{
+            margin-top : 7px ;
+            display : flex ;
+            justify-content: space-between;
+            align-items: center ;
+        }
+        .room-price{
+            color : var(--primary-color) ;
+            font-size: 14px ;
+        }
+        .max-count{
+            color : var(--primary-color) ;
+            font-size: 14px ;
+        }
+    }
+    .room-btns{
+        padding : 0px 10px ;
+        padding-bottom : 20px ;
+        display: flex ;
+        justify-content: start  ;
+        align-items: center  ;
+        gap : 10px  ;
+        .btn{
+            font-size: 13px ;
+            font-weight: 400;
+            padding : 4px 10px ;
+            width : 100% ;
+            background-color: var(--primary-color) ;
+            color : white ;
+            border-radius: 7px ;
+            cursor:pointer ;
+            border : 2px solid  var(--primary-color) ;
+            transition : all ease  0.3s ;
+            &:hover{
+                background-color: transparent ;
+                color : var(--primary-color) ;
+            }
+        }
+    }
+}

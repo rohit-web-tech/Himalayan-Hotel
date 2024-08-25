@@ -1,0 +1,27 @@
+{
+  "name": "himalayan_hotel_server",
+  "version": "1.0.0",
+  "description": "This is the himalayan hotel's server",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev" : "nodemon server.js"
+  },
+  "author": "Rohit",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "cron": "^3.1.6",
+    "dotenv": "^16.3.1",
+    "express": "^4.19.2",
+    "moment": "^2.29.4",
+    "mongoose": "^6.10.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.7",
+    "twilio": "^4.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

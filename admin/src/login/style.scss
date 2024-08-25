@@ -1,0 +1,14 @@
+#login-container{
+    width : 100% ;
+    min-height : 100vh ;
+    display: flex ;
+    justify-content: center ;
+    align-items: center ;
+}
+.login-container{
+    width: 70% ;
+    display: flex ;
+    justify-content: center ;
+    align-items: center ;
+    flex-direction:column;
+}
