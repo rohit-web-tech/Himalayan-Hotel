@@ -82,6 +82,9 @@ const User = () => {
     }
 
     const deleteUser = (user) => {
+        const userConfirmation = confirm(`Are you sure, you want to delete ${user?.userName || "User"}`);
+
+        if(!userConfirmation) return ;
         fetch(`${BASE_URL}/deleteUser`, {
             "method": "delete",
             "body": JSON.stringify(user),
