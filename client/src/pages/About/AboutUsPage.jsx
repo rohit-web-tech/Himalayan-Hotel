@@ -1,6 +1,6 @@
 import React from 'react'
 import About from './AboutUsContent/AboutUsContent'
-import image from '../../assets/heroBanner.jpg';
+import image from '../../assets/herobanner.jpg';
 
 const AboutUsPage = () => {
   return (
