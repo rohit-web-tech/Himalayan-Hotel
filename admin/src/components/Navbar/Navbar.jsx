@@ -18,7 +18,7 @@ const Navbar = () => {
                 className='bg-gray-700 py-2 px-3 text-white absolute text-lg'
                 onClick={() => setShowNav(true)}
             ><RxHamburgerMenu /></div>
-            <div className={`z-50 w-[300px] fixed top-0 left-0 bg-gray-700 text-white h-screen md:flex ${showNav ? "flex" : "hidden"} flex-col items-center justify-between py-6`}>
+            <div className={`z-50 w-[300px] fixed top-0 left-0 bg-gray-700 text-white h-full md:flex ${showNav ? "flex" : "hidden"} flex-col items-center justify-between py-6`}>
                 <div
                     className='text-2xl absolute right-3 top-3 md:hidden block'
                     onClick={closeNav}
