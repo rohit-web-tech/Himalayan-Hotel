@@ -82,10 +82,10 @@ const Admin = () => {
     }
 
     const deleteUser = (user) => {
-        const userConfirmation = confirm(`Are you sure, you want to delete ${user?.userName || "Admin"}`);
+        const userConfirmation = confirm(`Are you sure, you want to delete ${user?.userName || "Admin"} ?`);
 
         if(!userConfirmation) return ;
-        
+
         fetch(`${BASE_URL}/deleteUser`, {
             "method": "delete",
             "body": JSON.stringify(user),

@@ -81,7 +81,7 @@ const Rooms = () => {
     }
 
     const deleteRoom = (room) => {
-        const userConfirmation = confirm(`Are you sure, you want to delete ${room?.roomName || "Room"}`);
+        const userConfirmation = confirm(`Are you sure, you want to delete ${room?.roomName || "Room"} ?`);
 
         if(!userConfirmation) return ;
         fetch(`${BASE_URL}/deleteRoom`, {
