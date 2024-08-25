@@ -1,7 +1,7 @@
 import {useState,useEffect} from 'react' ;
 import './style.css';
 import Img from '../../../components/lazyloading/Img';
-import image from '../../../assets/heroBanner.jpg'
+import image from '../../../assets/herobanner.jpg'
 import { FaLocationDot} from "react-icons/fa6";
 import {
   FaPhoneAlt

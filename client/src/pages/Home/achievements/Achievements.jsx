@@ -1,6 +1,6 @@
 import React from "react";
 import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
-import image from "../../../assets/heroBanner.jpg";
+import image from "../../../assets/herobanner.jpg";
 
 const Achievements = () => {
   return (

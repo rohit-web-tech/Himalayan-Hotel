@@ -1,5 +1,4 @@
 import React from "react";
-import image from "../../assets/heroBanner.jpg";
 import { RiStarSFill } from "react-icons/ri";
 
 const RoomDetails = ({ setShowDetails , roomDetails , handleBook , roomId}) => {

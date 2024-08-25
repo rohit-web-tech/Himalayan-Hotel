@@ -1,5 +1,5 @@
 import React from "react";
-import image from "../../assets/heroBanner.jpg";
+import image from "../../assets/herobanner.jpg";
 import { RiStarSFill } from "react-icons/ri";
 import moment from 'moment';
 
