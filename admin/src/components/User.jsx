@@ -3,6 +3,8 @@ import Table, { TD, TR } from './Table'
 import Header from './Header';
 import UserForm from './form/UserForm';
 import { message } from "antd";
+import Loader from './loader';
+import NoData from './NoData';
 
 const User = () => {
     const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -10,8 +12,11 @@ const User = () => {
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
     const [editUserData, setEditUserData] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getUsers = async () => {
+        setLoading(true)
         fetch(`${BASE_URL}/allUsers`)
             .then(res => res.json())
             .then(res => {
@@ -19,7 +24,10 @@ const User = () => {
                     console.log(res)
                     setUsers(res?.users || []);
                 }
-            }).catch(err => console.log(err));
+            }).catch(err => console.log(err))
+            .finally(() => {
+                setLoading(false);
+            })
     }
 
     useEffect(() => {
@@ -31,6 +39,7 @@ const User = () => {
             message.warning("Please fill all the fields!!");
             return;
         }
+        setFormSubmitLoading(true);
         fetch(`${BASE_URL}/registerUser`, {
             "method": "POST",
             "body": JSON.stringify(user),
@@ -50,6 +59,8 @@ const User = () => {
                 }
             }).catch(err => {
                 message.error(err);
+            }).finally(() => {
+                setFormSubmitLoading(false);
             })
     }
 
@@ -58,7 +69,7 @@ const User = () => {
             message.warning("Please fill all the fields!!");
             return;
         }
-
+        setFormSubmitLoading(true);
         fetch(`${BASE_URL}/editUser`, {
             "method": "PATCH",
             "body": JSON.stringify(user),
@@ -78,13 +89,15 @@ const User = () => {
                 }
             }).catch(err => {
                 message.error(err);
+            }).finally(() => {
+                setFormSubmitLoading(false);
             })
     }
 
     const deleteUser = (user) => {
         const userConfirmation = confirm(`Are you sure, you want to delete ${user?.userName || "User"} ?`);
 
-        if(!userConfirmation) return ;
+        if (!userConfirmation) return;
         fetch(`${BASE_URL}/deleteUser`, {
             "method": "delete",
             "body": JSON.stringify(user),
@@ -148,30 +161,42 @@ const User = () => {
     return (
         <div className='flex flex-col  w-full md:w-[calc(100%-300px)] sm:px-14 px-6 py-3'>
             {
-                !showForm ? (
-                    <>
-                        <Header
-                            title="Users"
-                            handleBtn={() => {
-                                setShowForm(true);
-                            }}
-                            btnText="Add new user"
-                        />
-                        <Table tableFields={tableFeilds} tableRows={rowData} />
-                    </>
-                ) : (
-                    <UserForm
-                        title="Create New User"
-                        edit={editForm}
-                        initialUserData={editUserData}
-                        goBackHandler={closeForm}
-                        submitHandler={editForm ? editUser : addNewUser}
-                    />
-                )
+                loading ? (
+                    <Loader styles='w-10 h-10 my-[calc(50vh-40px)]' />
+                ) :
+                    users?.length < 1 ? (
+                        <div className='h-screen flex justify-center items-center'>
+                            <NoData
+                                title='No User found !!'
+                            />
+                        </div>
+                    ) : (
+                        !showForm ? (
+                            <>
+                                <Header
+                                    title="Users"
+                                    handleBtn={() => {
+                                        setShowForm(true);
+                                    }}
+                                    btnText="Add new user"
+                                />
+                                <Table tableFields={tableFeilds} tableRows={rowData} />
+                            </>
+                        ) : (
+                            <UserForm
+                                title="Create New User"
+                                edit={editForm}
+                                initialUserData={editUserData}
+                                goBackHandler={closeForm}
+                                submitHandler={editForm ? editUser : addNewUser}
+                                loading={formSubmitLoading}
+                            />
+                        )
+                    )
             }
 
         </div>
     )
 }
 
-export default User ;
+export default User;

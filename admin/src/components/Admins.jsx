@@ -3,6 +3,8 @@ import Table, { TD, TR } from './Table'
 import Header from './Header';
 import UserForm from './form/UserForm';
 import { message } from "antd";
+import Loader from "./loader.jsx"
+import NoData from "./NoData.jsx";
 
 const Admin = () => {
     const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -10,8 +12,11 @@ const Admin = () => {
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
     const [editUserData, setEditUserData] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getUsers = async () => {
+        setLoading(true);
         fetch(`${BASE_URL}/allAdmins`)
             .then(res => res.json())
             .then(res => {
@@ -19,7 +24,8 @@ const Admin = () => {
                     console.log(res)
                     setUsers(res?.admins || []);
                 }
-            }).catch(err => console.log(err));
+            }).catch(err => console.log(err))
+            .finally(() => setLoading(false))
     }
 
     useEffect(() => {
@@ -31,6 +37,7 @@ const Admin = () => {
             message.warning("Please fill all the fields!!");
             return;
         }
+        setFormSubmitLoading(true);
         fetch(`${BASE_URL}/registerAdmin`, {
             "method": "POST",
             "body": JSON.stringify(user),
@@ -50,7 +57,7 @@ const Admin = () => {
                 }
             }).catch(err => {
                 message.error(err);
-            })
+            }).finally(()=>setFormSubmitLoading(false))
     }
 
     const editUser = (user) => {
@@ -58,7 +65,7 @@ const Admin = () => {
             message.warning("Please fill all the fields!!");
             return;
         }
-
+        setFormSubmitLoading(true);
         fetch(`${BASE_URL}/editUser`, {
             "method": "PATCH",
             "body": JSON.stringify(user),
@@ -78,13 +85,13 @@ const Admin = () => {
                 }
             }).catch(err => {
                 message.error(err);
-            })
+            }).finally(()=>setFormSubmitLoading(false))
     }
 
     const deleteUser = (user) => {
         const userConfirmation = confirm(`Are you sure, you want to delete ${user?.userName || "Admin"} ?`);
 
-        if(!userConfirmation) return ;
+        if (!userConfirmation) return;
 
         fetch(`${BASE_URL}/deleteUser`, {
             "method": "delete",
@@ -149,25 +156,37 @@ const Admin = () => {
     return (
         <div className='flex flex-col w-full md:w-[calc(100%-300px)] sm:px-14 px-6 py-3'>
             {
-                !showForm ? (
-                    <>
-                        <Header
-                            title="Admins"
-                            handleBtn={() => {
-                                setShowForm(true);
-                            }}
-                            btnText="Add new admin"
+                loading ? (
+                    <Loader styles='w-10 h-10 my-[calc(50vh-40px)]' />
+                ) : 
+                users?.length < 1 ? (
+                    <div className='h-screen flex justify-center items-center'>
+                        <NoData 
+                            title='No Admin found !!'
                         />
-                        <Table tableFields={tableFeilds} tableRows={rowData} />
-                    </>
+                    </div>
                 ) : (
-                    <UserForm
-                        title="Create New Admin"
-                        edit={editForm}
-                        initialUserData={editUserData}
-                        goBackHandler={closeForm}
-                        submitHandler={editForm ? editUser : addNewUser}
-                    />
+                    !showForm ? (
+                        <>
+                            <Header
+                                title="Admins"
+                                handleBtn={() => {
+                                    setShowForm(true);
+                                }}
+                                btnText="Add new admin"
+                            />
+                            <Table tableFields={tableFeilds} tableRows={rowData} />
+                        </>
+                    ) : (
+                        <UserForm
+                            title="Create New Admin"
+                            edit={editForm}
+                            initialUserData={editUserData}
+                            goBackHandler={closeForm}
+                            submitHandler={editForm ? editUser : addNewUser}
+                            loading={formSubmitLoading}
+                        />
+                    )
                 )
             }
 

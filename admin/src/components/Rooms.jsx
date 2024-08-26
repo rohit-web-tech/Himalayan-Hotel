@@ -3,6 +3,8 @@ import Table, { TD, TR } from './Table'
 import Header from './Header';
 import { message } from "antd";
 import RoomForm from './form/RoomForm';
+import Loader from './loader';
+import NoData from './NoData';
 
 const Rooms = () => {
     const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -10,14 +12,20 @@ const Rooms = () => {
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
     const [editRoomData, seteditRoomData] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getrooms = async () => {
+        setLoading(true)
         fetch(`${BASE_URL}/getRooms`)
             .then(res => res.json())
             .then(res => {
-                    console.log(res)
-                    setRooms(res || []);
-            }).catch(err => console.log(err));
+                console.log(res)
+                setRooms(res || []);
+            }).catch(err => console.log(err))
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
     useEffect(() => {
@@ -30,6 +38,7 @@ const Rooms = () => {
             message.warning("Please fill all the fields!!");
             return;
         }
+        setFormSubmitLoading(true);
         fetch(`${BASE_URL}/setRoomData`, {
             "method": "POST",
             "body": JSON.stringify(room),
@@ -49,6 +58,8 @@ const Rooms = () => {
                 }
             }).catch(err => {
                 message.error(err);
+            }).finally(() => {
+                setFormSubmitLoading(false)
             })
     }
 
@@ -58,6 +69,7 @@ const Rooms = () => {
             return;
         }
 
+        setFormSubmitLoading(true)
         fetch(`${BASE_URL}/editRoom`, {
             "method": "PATCH",
             "body": JSON.stringify(room),
@@ -77,13 +89,15 @@ const Rooms = () => {
                 }
             }).catch(err => {
                 message.error(err);
+            }).finally(() => {
+                setFormSubmitLoading(false)
             })
     }
 
     const deleteRoom = (room) => {
         const userConfirmation = confirm(`Are you sure, you want to delete ${room?.roomName || "Room"} ?`);
 
-        if(!userConfirmation) return ;
+        if (!userConfirmation) return;
         fetch(`${BASE_URL}/deleteRoom`, {
             "method": "delete",
             "body": JSON.stringify(room),
@@ -149,26 +163,38 @@ const Rooms = () => {
     return (
         <div className='flex flex-col  w-full md:w-[calc(100%-300px)]  min-h-screen sm:px-14 px-6 py-3'>
             {
-                !showForm ? (
-                    <>
-                        <Header
-                            title="Rooms"
-                            handleBtn={() => {
-                                setShowForm(true);
-                            }}
-                            btnText="Add new room"
-                        />
-                        <Table tableFields={tableFeilds} tableRows={rowData} />
-                    </>
-                ) : (
-                    <RoomForm
-                        title="Add new room"
-                        edit={editForm}
-                        initialUserData={editRoomData}
-                        goBackHandler={closeForm}
-                        submitHandler={editForm ? editRoom : addNewRoom}
-                    />
-                )
+                loading ? (
+                    <Loader styles="h-10 w-10 my-[calc(50vh-40px)]" />
+                ) :
+                    rooms?.length < 1 ? (
+                        <div className='h-screen flex justify-center items-center'>
+                            <NoData
+                                title='No Room Data found !!'
+                            />
+                        </div>
+                    ) : (
+                        !showForm ? (
+                            <>
+                                <Header
+                                    title="Rooms"
+                                    handleBtn={() => {
+                                        setShowForm(true);
+                                    }}
+                                    btnText="Add new room"
+                                />
+                                <Table tableFields={tableFeilds} tableRows={rowData} />
+                            </>
+                        ) : (
+                            <RoomForm
+                                title="Add new room"
+                                edit={editForm}
+                                initialUserData={editRoomData}
+                                goBackHandler={closeForm}
+                                submitHandler={editForm ? editRoom : addNewRoom}
+                                loading={formSubmitLoading}
+                            />
+                        )
+                    )
             }
 
         </div>

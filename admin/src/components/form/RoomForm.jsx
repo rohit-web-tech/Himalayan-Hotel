@@ -3,7 +3,7 @@ import InputBox from './InputBox'
 import Submit from './Submit'
 import ImagePreview from './ImagePreview'
 
-const RoomForm = ({ title, initialUserData = "", edit = false, submitHandler = () => { }, goBackHandler = () => { } }) => {
+const RoomForm = ({ loading=false , title, initialUserData = "", edit = false, submitHandler = () => { }, goBackHandler = () => { } }) => {
     const [room, setRoom] = useState(initialUserData || {
         room_id: "",
         roomName: "",
@@ -67,7 +67,7 @@ const RoomForm = ({ title, initialUserData = "", edit = false, submitHandler = (
                 <ImagePreview
                     src={room?.imageUrls}
                 />
-                <Submit value={edit ? "Save Changes" : "Add Room"} />
+                <Submit value={loading ? (<Loader styles="h-4 w-4" />) : edit ? "Save Changes" : "Add Room"} />
             </form>
         </div>
     )

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import InputBox from './InputBox'
 import Submit from './Submit'
+import Loader from '../loader'
 
-const UserForm = ({ title, initialUserData = "", edit = false, submitHandler = () => { } , goBackHandler = () => {}}) => {
+const UserForm = ({loading=false, title, initialUserData = "", edit = false, submitHandler = () => { } , goBackHandler = () => {}}) => {
     const [user, setUser] = useState(initialUserData || {
         userName: "",
         userEmail: "",
@@ -54,7 +55,7 @@ const UserForm = ({ title, initialUserData = "", edit = false, submitHandler = (
                     value={user?.userPassword}
                     label="Password"
                     />
-                <Submit value={edit ? "Save Changes" : "Register"} />
+                <Submit value={loading ? (<Loader styles="h-4 w-4" />) : (edit ? "Save Changes" : "Register")} />
             </form>
         </div>
     )
