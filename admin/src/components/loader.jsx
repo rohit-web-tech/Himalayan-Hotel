@@ -8,4 +8,4 @@ const Loader = ({styles="w-10 h-10"}) => {
   )
 }
 
-export default Loader ;
+export default Loader
