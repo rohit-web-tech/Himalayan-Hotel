@@ -8,7 +8,9 @@ import BookRoom from '../../bookRoom/BookRoom';
 
 
 const Room = (props) => {
-    // const navigate = useNavigate();
+    const [bookingLoading,setBookingLoading] = useState(false);
+    const [showDetails,setShowDetails] = useState(false);
+    const [showBookRoom,setShowBookRoom] = useState(false);
     const BASE_URL = import.meta.env.VITE_BASE_URL ;
     const handleBook = (roomId) => {
         const fromDate = props.dates.fromDate ,toDate = props.dates.toDate ;
@@ -22,6 +24,7 @@ const Room = (props) => {
     const handleBookRoom = (roomId) =>{
         const loggedInUser = JSON.parse(localStorage.getItem("akhoteluser")) ;
         const fromDate = props.dates.fromDate ,toDate = props.dates.toDate ;
+        setBookingLoading(true)
         fetch(`${BASE_URL}/bookRoom`,{
             "method" : "POST" ,
             "body" : JSON.stringify({fromDate,toDate,userId:loggedInUser._id,roomId}),
@@ -36,10 +39,9 @@ const Room = (props) => {
             }else{
                 message.error(res.message)
             }
-          }).catch(err=>message.error(err));
+          }).catch(err=>message.error(err))
+          .finally(() => setBookingLoading(false))
     }
-    const [showDetails,setShowDetails] = useState(false);
-    const [showBookRoom,setShowBookRoom] = useState(false);
     return (
         <div id="room-container">
             <div className="room-image">
@@ -77,7 +79,7 @@ const Room = (props) => {
                 showDetails && <RoomDetails handleBook={handleBook} roomId={props?.roomId} setShowDetails={setShowDetails} roomDetails={props?.room}/> 
             }
             {
-                showBookRoom && <BookRoom roomId={props?.roomId} handleBookRoom={handleBookRoom} dates={props?.dates} setShowBookRoom={setShowBookRoom} roomDetails={props?.room}/>
+                showBookRoom && <BookRoom loading={bookingLoading} roomId={props?.roomId} handleBookRoom={handleBookRoom} dates={props?.dates} setShowBookRoom={setShowBookRoom} roomDetails={props?.room}/>
             }
         </div>
     )

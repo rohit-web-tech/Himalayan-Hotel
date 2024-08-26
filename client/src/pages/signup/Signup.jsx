@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { message } from 'antd';
+import Loader from '../../components/loader';
 
 const Signup = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
     userName: "",
     userNumber: "",
@@ -22,6 +24,7 @@ const Signup = () => {
     if (userData.userName != "" && userData.userPassword != "" && userData.userEmail != "" && userData.userNumber != "") {
       //checking for a valid mobile number
       if (userData.userNumber.length === 10) {
+        setLoading(true);
         fetch(`${BASE_URL}/registerUser`, {
           "method": "POST",
           "body": JSON.stringify(userData),
@@ -42,7 +45,7 @@ const Signup = () => {
           }).catch(err => {
             console.log("Error encountered!!");
             message.error(err);
-          })
+          }).finally(()=> setLoading(false))
       } else {
         message.warning("Please Enter a Valid Indian Mobile Number without Country Code(+91)!!")
       }
@@ -97,8 +100,8 @@ const Signup = () => {
                   id="password" />
               </div>
 
-              <button onClick={handleSignUp} className="h-9 px-3 w-full bg-[--primary-color] hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm">
-                Sign Up
+              <button onClick={handleSignUp} className={`h-9 px-3 w-full ${loading ? "bg-slate-300" : "bg-[--primary-color]"} hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm`}>
+                {loading ? <Loader styles='h-6 w-6'/> : "Register"}
               </button>
             </div>
           </div>

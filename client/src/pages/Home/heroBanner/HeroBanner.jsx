@@ -1,32 +1,8 @@
-import {useEffect,useState} from "react";
 import herobanner from "../../../assets/herobanner.jpg";
 import { useNavigate } from "react-router-dom";
 import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
-const HeroBanner = () => {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
-  const [data, setData] = useState({
-    title: "",
-    subtitle: "",
-    imageUrl: ""
-  })
-
-  const getData = async () => {
-    fetch(`${BASE_URL}/getHome`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.message == "success") {
-          setData(res?.home || {
-            title: "",
-            subtitle: "",
-            imageUrl: ""
-          });
-        }
-      }).catch(err => console.log(err));
-  }
-
-  useEffect(() => {
-    getData();
-  }, [])
+const HeroBanner = ({data}) => {
+  console.log(data?.imageUrl);
   const navigate = useNavigate();
   return (
     <div className="h-[500px] relative w-full flex justify-center items-center bg-gray-700">

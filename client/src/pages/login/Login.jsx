@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {message} from 'antd' ;
+import Loader from '../../components/loader';
 const Login = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
     userEmail: "",
     userPassword: ""
@@ -16,6 +18,7 @@ const Login = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     if (userData.userPassword != "" && userData.userEmail != "") {
+      setLoading(true);
       fetch(`${BASE_URL}/loginUser`, {
         "method": "POST",
         "body": JSON.stringify(userData),
@@ -35,7 +38,7 @@ const Login = () => {
         }).catch(err => {
           console.log("Error encountered!!");
           message.error(err);
-        })
+        }).finally(()=> setLoading(false))
     } else {
       message.warning('Please fill all the fields!!');
       return;
@@ -72,8 +75,8 @@ const Login = () => {
                   id="password" />
               </div>
 
-              <button onClick={handleLogin} className="h-9 px-3 w-full bg-[--primary-color] hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm">
-                Login
+              <button onClick={handleLogin} className={`h-9 px-3 w-full ${loading ? "bg-slate-300" : "bg-[--primary-color]"} hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm`}>
+                {loading ? <Loader styles='h-6 w-6'/> : "Login"}
               </button>
             </div>
           </div>

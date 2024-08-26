@@ -3,31 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./style.css";
 import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
 import Img from "../../../components/lazyloading/Img";
-export default function About({ src, showBtn }) {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
-  const [data, setData] = useState({
-    title: "",
-    description: "",
-    imageUrl: ""
-  })
-
-  const getData = async () => {
-    fetch(`${BASE_URL}/getAbout`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.message == "success") {
-          setData(res?.about || {
-            title: "",
-            description: "",
-            imageUrl: ""
-          });
-        }
-      }).catch(err => console.log(err));
-  }
-
-  useEffect(() => {
-    getData();
-  }, [])
+export default function About({ src, showBtn,data }) {
   const navigate = useNavigate();
   return (
     <div

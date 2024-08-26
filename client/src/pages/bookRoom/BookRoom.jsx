@@ -2,8 +2,9 @@ import React from "react";
 import image from "../../assets/herobanner.jpg";
 import { RiStarSFill } from "react-icons/ri";
 import moment from 'moment';
+import Loader from "../../components/loader";
 
-const BookRoom = ({ setShowBookRoom , roomDetails , dates , handleBookRoom ,roomId}) => {
+const BookRoom = ({ setShowBookRoom , roomDetails , dates , handleBookRoom ,roomId, loading}) => {
     const fromDate = dates.fromDate , toDate = dates.toDate ;
     const fromdate = moment(fromDate, 'DD-MMM-YYYY');
     const todate = moment(toDate, 'DD-MMM-YYYY');
@@ -73,9 +74,9 @@ const BookRoom = ({ setShowBookRoom , roomDetails , dates , handleBookRoom ,room
                     <button
                       onClick={()=>handleBookRoom(roomId)}
                       type="submit"
-                      class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-[--primary-color] px-8 py-3 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2"
+                      class={`mt-6 flex w-full items-center justify-center rounded-md border border-transparent px-8 py-3 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 ${!loading ? "bg-[--primary-color]" : "bg-slate-300" }`}
                     >
-                      Book Now !
+                      {loading ? <Loader className="h-4 w-4"/> : "Book Now !"}
                     </button>
                   </section>
                 </div>

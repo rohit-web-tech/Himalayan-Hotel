@@ -23,8 +23,10 @@ const Booking = () => {
       "fromDate": !dates ? "" : moment(dates[0]?.format("DD-MMM-YYYY"))._i,
       "toDate": !dates ? "" : moment(dates[1]?.format("DD-MMM-YYYY"))._i
     })
+    
     let fromDate = moment(dates[0]?.format("DD-MMM-YYYY"))._i;
     let toDate = moment(dates[1]?.format("DD-MMM-YYYY"))._i;
+
     setTimeout(() => {
       if (Dates.fromDate !== "" && Dates.toDate !== "") {
         let tempRooms = [];

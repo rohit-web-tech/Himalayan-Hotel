@@ -1,4 +1,3 @@
-import {useState,useEffect} from 'react' ;
 import './style.css';
 import Img from '../../../components/lazyloading/Img';
 import image from '../../../assets/herobanner.jpg'
@@ -9,33 +8,7 @@ import {
 import { IoTime } from "react-icons/io5";
 import { MdEmail } from "react-icons/md";
 
-export default function Location() {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
-  const [data, setData] = useState({
-      contact: "",
-      email: "",
-      address: "",
-      imageUrl: ""
-  })
-
-  const getData = async () => {
-      fetch(`${BASE_URL}/getContact`)
-          .then(res => res.json())
-          .then(res => {
-              if (res.message == "success") {
-                  setData(res?.contact || {
-                      contact: "",
-                      email: "",
-                      address: "",
-                      imageUrl: ""
-                  });
-              }
-          }).catch(err => console.log(err));
-  }
-
-  useEffect(() => {
-      getData();
-  }, [])
+export default function Location({data}) {
   return (
     <div id="element-card" className="flex-box justify-center aling-center text-[--primary-color]">
             <div className='element-card'>
