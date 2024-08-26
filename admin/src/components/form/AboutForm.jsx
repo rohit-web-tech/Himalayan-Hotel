@@ -4,9 +4,9 @@ import Submit from './Submit'
 import ImagePreview from './ImagePreview'
 import { message } from "antd";
 import Loader from '../loader';
+import { fetchData, fetchGetData } from '../../lib/fetchData';
 
 const About = () => {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const [data, setData] = useState({
         title: "",
         description: "",
@@ -16,54 +16,37 @@ const About = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getData = async () => {
-        setLoading(true);
-        fetch(`${BASE_URL}/getAbout`)
-            .then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    setData(res?.about || {
-                        title: "",
-                        description: "",
-                        imageUrl: ""
-                    });
-                }
-            }).catch(err => console.log(err))
-            .finally(() => setLoading(false))
+        const res = await fetchGetData("/getAbout", setLoading);
+        if (res.message == "success") {
+            setData(res?.about || {
+                title: "",
+                description: "",
+                imageUrl: ""
+            });
+        }
     }
 
     useEffect(() => {
         getData();
     }, [])
 
-    const addNewData = () => {
+    const addNewData = async () => {
         if (!data?.title || !data?.description || !data?.imageUrl) {
             message.warning("Please fill all the fields!!");
             return;
         }
-        setFormSubmitLoading(true);
-        fetch(`${BASE_URL}/setAbout`, {
-            "method": "POST",
-            "body": JSON.stringify(data),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("About details edited successfully!!");
-                    setData(res?.about || {
-                        title: "",
-                        description: "",
-                        imageUrl: ""
-                    });
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            }).finally(() => {
-                setFormSubmitLoading(false)
-            })
+
+        const res = await fetchData("/setAbout", setFormSubmitLoading, "POST", data);
+        if (res.message == "success") {
+            message.success("About details edited successfully!!");
+            setData(res?.about || {
+                title: "",
+                description: "",
+                imageUrl: ""
+            });
+        } else {
+            message.error(res.message);
+        }
     }
 
     const handleUserInput = (e) => {

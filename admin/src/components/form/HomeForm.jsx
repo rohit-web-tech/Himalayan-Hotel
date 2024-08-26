@@ -4,9 +4,9 @@ import Submit from './Submit'
 import ImagePreview from './ImagePreview'
 import { message } from "antd";
 import Loader from '../loader';
+import {fetchData,fetchGetData} from '../../lib/fetchData';
 
 const Home = () => {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const [data, setData] = useState({
         title: "",
         subtitle: "",
@@ -16,54 +16,42 @@ const Home = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getData = async () => {
-        setLoading(true);
-        fetch(`${BASE_URL}/getHome`)
-            .then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    setData(res?.home || {
-                        title: "",
-                        subtitle: "",
-                        imageUrl: ""
-                    });
-                }
-            }).catch(err => console.log(err))
-            .finally(() => setLoading(false))
+        const data = await fetchGetData("/getHome", setLoading);
+        console.log(data)
+        if (data.message == "success") {
+            setData(data?.home || {
+                title: "",
+                subtitle: "",
+                imageUrl: ""
+            });
+        } else {
+            message.error(data.message);
+        }
     }
 
     useEffect(() => {
         getData();
     }, [])
 
-    const addNewData = () => {
+    const addNewData = async () => {
+
         if (!data?.title || !data?.subtitle || !data?.imageUrl) {
             message.warning("Please fill all the fields!!");
             return;
         }
-        setFormSubmitLoading(true);
-        fetch(`${BASE_URL}/setHome`, {
-            "method": "POST",
-            "body": JSON.stringify(data),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("Home details edited successfully!!");
-                    setData(res?.home || {
-                        title: "",
-                        subtitle: "",
-                        imageUrl: ""
-                    });
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            }).finally(() => {
-                setFormSubmitLoading(false)
-            })
+
+        const res = await fetchData("/setHome", setFormSubmitLoading ,"POST", data);
+        if (res?.message == "success") {
+            message.success("Home details edited successfully!!");
+            setData(res?.home || {
+                title: "",
+                subtitle: "",
+                imageUrl: ""
+            });
+        } else {
+            message.error(res?.message);
+        }
+
     }
 
     const handleUserInput = (e) => {

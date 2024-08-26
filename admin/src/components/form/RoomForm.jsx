@@ -2,6 +2,7 @@ import { useState } from 'react'
 import InputBox from './InputBox'
 import Submit from './Submit'
 import ImagePreview from './ImagePreview'
+import Loader from '../loader'
 
 const RoomForm = ({ loading=false , title, initialUserData = "", edit = false, submitHandler = () => { }, goBackHandler = () => { } }) => {
     const [room, setRoom] = useState(initialUserData || {

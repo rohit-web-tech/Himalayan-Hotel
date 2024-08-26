@@ -5,9 +5,9 @@ import UserForm from './form/UserForm';
 import { message } from "antd";
 import Loader from './loader';
 import NoData from './NoData';
+import { fetchData, fetchGetData } from '../lib/fetchData';
 
 const User = () => {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const [users, setUsers] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
@@ -16,105 +16,63 @@ const User = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getUsers = async () => {
-        setLoading(true)
-        fetch(`${BASE_URL}/allUsers`)
-            .then(res => res.json())
-            .then(res => {
-                if (res.message === "success") {
-                    console.log(res)
-                    setUsers(res?.users || []);
-                }
-            }).catch(err => console.log(err))
-            .finally(() => {
-                setLoading(false);
-            })
+        const res = await fetchGetData("/allUsers", setLoading);
+        if (res.message === "success") {
+            console.log(res)
+            setUsers(res?.users || []);
+        }
     }
 
     useEffect(() => {
         getUsers();
     }, [])
 
-    const addNewUser = (user) => {
+    const addNewUser = async (user) => {
         if (!user?.userName || !user?.userEmail || !user?.userNumber || !user?.userPassword) {
             message.warning("Please fill all the fields!!");
             return;
         }
-        setFormSubmitLoading(true);
-        fetch(`${BASE_URL}/registerUser`, {
-            "method": "POST",
-            "body": JSON.stringify(user),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("User registered successfully!!");
-                    setTimeout(() => {
-                        getUsers();
-                        closeForm();
-                    }, 1000)
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            }).finally(() => {
-                setFormSubmitLoading(false);
-            })
+        const res = await fetchData("/registerUser", setFormSubmitLoading, "POST", user);
+        if (res.message == "success") {
+            message.success("User registered successfully!!");
+            setTimeout(() => {
+                getUsers();
+                closeForm();
+            }, 1000)
+        } else {
+            message.error(res.message);
+        }
     }
 
-    const editUser = (user) => {
+    const editUser = async (user) => {
         if (!user?.userName || !user?.userEmail || !user?.userNumber || !user?.userPassword) {
             message.warning("Please fill all the fields!!");
             return;
         }
-        setFormSubmitLoading(true);
-        fetch(`${BASE_URL}/editUser`, {
-            "method": "PATCH",
-            "body": JSON.stringify(user),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("User details edited successfully!!");
-                    setTimeout(() => {
-                        getUsers();
-                        closeForm();
-                    }, 1000)
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            }).finally(() => {
-                setFormSubmitLoading(false);
-            })
+        const res = await fetchData("/editUser", setFormSubmitLoading, "PATCH", user);
+        if (res.message == "success") {
+            message.success("User details edited successfully!!");
+            setTimeout(() => {
+                getUsers();
+                closeForm();
+            }, 1000)
+        } else {
+            message.error(res.message);
+        }
     }
 
-    const deleteUser = (user) => {
+    const deleteUser = async (user) => {
         const userConfirmation = confirm(`Are you sure, you want to delete ${user?.userName || "User"} ?`);
 
         if (!userConfirmation) return;
-        fetch(`${BASE_URL}/deleteUser`, {
-            "method": "delete",
-            "body": JSON.stringify(user),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("User details deleted successfully!!");
-                    getUsers();
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            })
+
+        const res = await fetchData("/deleteUser", setFormSubmitLoading, "DELETE", user);
+        if (res.message == "success") {
+            message.success("User details deleted successfully!!");
+            getUsers();
+        } else {
+            message.error(res.message);
+        }
     }
 
     const closeForm = () => {

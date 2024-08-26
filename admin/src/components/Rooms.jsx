@@ -5,9 +5,9 @@ import { message } from "antd";
 import RoomForm from './form/RoomForm';
 import Loader from './loader';
 import NoData from './NoData';
+import { fetchData, fetchGetData } from '../lib/fetchData';
 
 const Rooms = () => {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const [rooms, setRooms] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
@@ -16,105 +16,63 @@ const Rooms = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getrooms = async () => {
-        setLoading(true)
-        fetch(`${BASE_URL}/getRooms`)
-            .then(res => res.json())
-            .then(res => {
-                console.log(res)
-                setRooms(res || []);
-            }).catch(err => console.log(err))
-            .finally(() => {
-                setLoading(false)
-            })
+        const res = await fetchGetData("/getRooms", setLoading);
+        setRooms(res || []);
     }
 
     useEffect(() => {
         getrooms();
     }, [])
 
-    const addNewRoom = (room) => {
-        console.log(room)
-        if (!room?.roomName || !room?.roomRent || !room?.maxCount || !room?.room_id || !room?.imageUrls) {
-            message.warning("Please fill all the fields!!");
-            return;
-        }
-        setFormSubmitLoading(true);
-        fetch(`${BASE_URL}/setRoomData`, {
-            "method": "POST",
-            "body": JSON.stringify(room),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("Room added successfully!!");
-                    setTimeout(() => {
-                        getrooms();
-                        closeForm();
-                    }, 1000)
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            }).finally(() => {
-                setFormSubmitLoading(false)
-            })
-    }
-
-    const editRoom = (room) => {
+    const addNewRoom = async (room) => {
         if (!room?.roomName || !room?.roomRent || !room?.maxCount || !room?.room_id || !room?.imageUrls) {
             message.warning("Please fill all the fields!!");
             return;
         }
 
-        setFormSubmitLoading(true)
-        fetch(`${BASE_URL}/editRoom`, {
-            "method": "PATCH",
-            "body": JSON.stringify(room),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("Room details edited successfully!!");
-                    setTimeout(() => {
-                        getrooms();
-                        closeForm();
-                    }, 1000)
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            }).finally(() => {
-                setFormSubmitLoading(false)
-            })
+        const res = await fetchData("/setRoomData", setFormSubmitLoading, "POST", room);
+        if (res.message == "success") {
+            message.success("Room added successfully!!");
+            setTimeout(() => {
+                getrooms();
+                closeForm();
+            }, 1000)
+        } else {
+            message.error(res.message);
+        }
+
     }
 
-    const deleteRoom = (room) => {
+    const editRoom = async (room) => {
+        if (!room?.roomName || !room?.roomRent || !room?.maxCount || !room?.room_id || !room?.imageUrls) {
+            message.warning("Please fill all the fields!!");
+            return;
+        }
+
+        const res = await fetchData("/editRoom", setFormSubmitLoading, "PATCH", room);
+        if (res.message == "success") {
+            message.success("Room details edited successfully!!");
+            setTimeout(() => {
+                getrooms();
+                closeForm();
+            }, 1000)
+        } else {
+            message.error(res.message);
+        }
+    }
+
+    const deleteRoom = async(room) => {
         const userConfirmation = confirm(`Are you sure, you want to delete ${room?.roomName || "Room"} ?`);
 
         if (!userConfirmation) return;
-        fetch(`${BASE_URL}/deleteRoom`, {
-            "method": "delete",
-            "body": JSON.stringify(room),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("Room details deleted successfully!!");
-                    getrooms();
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            })
+
+        const res = await fetchData("/deleteRoom", setFormSubmitLoading, "DELETE", room);
+        if (res.message == "success") {
+            message.success("Room details deleted successfully!!");
+            getrooms();
+        } else {
+            message.error(res.message);
+        }
     }
 
     const closeForm = () => {

@@ -73,6 +73,7 @@ const Navbar = () => {
                 </ul>
                 <div className='bg-red-600 py-1 hover:bg-red-800 hover:cursor-pointer w-44 text-sm rounded-md text-center'
                     onClick={() => {
+                        if(!confirm("Are you sure, you want to logout ?")) return ;
                         localStorage.removeItem('akhoteladmin');
                         navigate("/login");
                     }}

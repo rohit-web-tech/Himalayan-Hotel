@@ -4,9 +4,9 @@ import Submit from './Submit'
 import ImagePreview from './ImagePreview'
 import { message } from "antd";
 import Loader from '../loader';
+import { fetchData, fetchGetData } from '../../lib/fetchData';
 
 const Contact = () => {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const [data, setData] = useState({
         contact: "",
         email: "",
@@ -17,56 +17,39 @@ const Contact = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getData = async () => {
-        setLoading(true);
-        fetch(`${BASE_URL}/getContact`)
-            .then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    setData(res?.contact || {
-                        contact: "",
-                        email: "",
-                        address: "",
-                        imageUrl: ""
-                    });
-                }
-            }).catch(err => console.log(err))
-            .finally(() => setLoading(false))
+        const res = await fetchGetData("/getContact", setLoading);
+        if (res.message == "success") {
+            setData(res?.contact || {
+                contact: "",
+                email: "",
+                address: "",
+                imageUrl: ""
+            });
+        }
     }
 
     useEffect(() => {
         getData();
     }, [])
 
-    const addNewData = () => {
+    const addNewData = async () => {
         if (!data?.contact || !data?.email || !data?.address || !data?.imageUrl) {
             message.warning("Please fill all the fields!!");
             return;
         }
-        setFormSubmitLoading(true);
-        fetch(`${BASE_URL}/setContact`, {
-            "method": "POST",
-            "body": JSON.stringify(data),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("Contact details edited successfully!!");
-                    setData(res?.contact || {
-                        contact: "",
-                        email: "",
-                        address: "",
-                        imageUrl: ""
-                    });
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            }).finally(() => {
-                setFormSubmitLoading(false)
-            })
+
+        const res = await fetchData("/setContact", setFormSubmitLoading, "POST", data);
+        if (res.message == "success") {
+            message.success("Contact details edited successfully!!");
+            setData(res?.contact || {
+                contact: "",
+                email: "",
+                address: "",
+                imageUrl: ""
+            });
+        } else {
+            message.error(res.message);
+        }
     }
 
     const handleUserInput = (e) => {
