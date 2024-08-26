@@ -12,7 +12,6 @@ router.get("/getAbout", async(req,res)=>{
 })
 
 router.post("/setAbout",async(req,res)=>{
-    console.log('Upadtes')
     try {
         const {title, imageUrl , description} = req.body ;
         await AboutModel.deleteMany({});
