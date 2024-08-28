@@ -25,5 +25,14 @@ cron.schedule('* * * * *', () => {
 });
 
 
+// routes
+import homeRoute from  "./routes/home.route.js";
+import aboutRoute from  "./routes/about.route.js";
+import contactRoute from  "./routes/contact.route.js";
+
+app.use("/api/home",homeRoute);
+app.use("/api/about",aboutRoute);
+app.use("/api/contact",contactRoute);
+
 
 export default app ;
