@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { message } from 'antd';
 import Loader from '../../components/loader';
 import { fetchData } from '../../lib/fetchData';
+import InputBox from '../../components/InputBox';
 const Login = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
@@ -47,22 +48,20 @@ const Login = () => {
 
             <div className="mt-8 space-y-8">
               <div className="space-y-6">
-                <input
-                  onChange={handleUserInput}
+                <InputBox
+                  handleChange={handleUserInput}
                   value={userData.userEmail}
-                  className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500"
                   placeholder="Your Email"
                   type="email"
                   name="userEmail"
-                  id="email" />
-                <input
-                  onChange={handleUserInput}
+                />
+                <InputBox
+                  handleChange={handleUserInput}
                   value={userData.userPassword}
-                  className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500 "
-                  placeholder="Your Password"
+                  placeholder="Your Email"
                   type="password"
                   name="userPassword"
-                  id="password" />
+                />
               </div>
 
               <button onClick={handleLogin} className={`h-9 px-3 w-full ${loading ? "bg-slate-300" : "bg-[--primary-color]"} hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm`}>

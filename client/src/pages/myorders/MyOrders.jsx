@@ -106,6 +106,7 @@ const MyOrders = () => {
                                                             >
                                                                 <p className="hover:text-blue-600 hover:cursor-pointer pl-6 text-center underline text-blue-400" onClick={() => {
                                                                     if (booking?.status == "booked") {
+                                                                        if(!confirm(`Are you sure , you want to cancel your booking for ${booking?.roomName || "this room"} from ${booking?.fromDate || "00-00-2000"} to ${booking?.toDate || "00-00-2000"} ?`)) return ;
                                                                         fetchData(`/cancelBooking`, () => { }, "POST", { bookingId: booking?._id })
                                                                             .then(res => {
                                                                                 message.success("Booking cancelled successfully!!")

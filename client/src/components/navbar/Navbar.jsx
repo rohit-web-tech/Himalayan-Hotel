@@ -42,6 +42,14 @@ const Navbar = () => {
     getData();
   }, [])
 
+  const LI = ({ styles = "", endpoint = "/", handleClick = () => { }, value = "" }) => (
+    <li className={`hover:cursor-pointer hover:text-white ${styles}`} onClick={handleClick}>
+      <NavBtn to={endpoint}>
+        {value}
+      </NavBtn>
+    </li>
+  )
+
 
   return (
     <div className="flex flex-col w-full sticky top-0 z-50">
@@ -83,18 +91,10 @@ const Navbar = () => {
               <Img src={logo} className="h-10" />
             </div>
             <ul className="hidden items-center gap-6 text-sm text-[--secondary-color] cursor-pointer sm:flex">
-              <li className="hover:cursor-pointer hover:text-white">
-                <NavBtn to="/">Home</NavBtn>
-              </li>
-              <li className="hover:cursor-pointer hover:text-white">
-                <NavBtn to="/booking">Book Room</NavBtn>
-              </li>
-              <li className="hover:cursor-pointer hover:text-white">
-                <NavBtn to="/about">About Us</NavBtn>
-              </li>
-              <li className="hover:cursor-pointer hover:text-white">
-                <NavBtn to="/contact">Contact Us</NavBtn>
-              </li>
+              <LI value="Home" endpoint="/" />
+              <LI value="Book Room" endpoint="/booking" />
+              <LI value="About Us" endpoint="/about" />
+              <LI value="Contact Us" endpoint="/contact" />
             </ul>
             <div className="flex items-center gap-3">
               <IoMdLogIn onClick={() => { navigate("/userprofile") }} className="text-[--secondary-color] text-[32px] sm:block hidden" />
@@ -120,21 +120,11 @@ const Navbar = () => {
           {
             showSideNav && (
               <ul className="fixed left-0 flex-col z-80 bg-[--primary-color] flex w-full flex-wrap mt-2 border-[--secondary-color] border-t items-center justify-between gap-4 text-sm text-[--secondary-color] cursor-pointer sm:hidden py-3">
-                <li className="hover:cursor-pointer hover:text-white" onClick={() => setShowSideNav(false)}>
-                  <NavBtn to="/">Home</NavBtn>
-                </li>
-                <li className="hover:cursor-pointer hover:text-white" onClick={() => setShowSideNav(false)}>
-                  <NavBtn to="/booking">Book Room</NavBtn>
-                </li>
-                <li className="hover:cursor-pointer hover:text-white" onClick={() => setShowSideNav(false)}>
-                  <NavBtn to="/about">About Us</NavBtn>
-                </li>
-                <li className="hover:cursor-pointer hover:text-white" onClick={() => setShowSideNav(false)}>
-                  <NavBtn to="/contact">Contact Us</NavBtn>
-                </li>
-                <li className="hover:cursor-pointer hover:text-white" onClick={() => setShowSideNav(false)}>
-                  <NavBtn to="/userprofile">My Bookings</NavBtn>
-                </li>
+                <LI value="Home" endpoint="/" handleClick={() => setShowSideNav(false)} />
+                <LI value="Book Room" endpoint="/booking" handleClick={() => setShowSideNav(false)} />
+                <LI value="About Us" endpoint="/about" handleClick={() => setShowSideNav(false)} />
+                <LI value="Contact Us" endpoint="/contact" handleClick={() => setShowSideNav(false)} />
+                <LI value="My Bookings" endpoint="/userprofile" handleClick={() => setShowSideNav(false)} />
               </ul>
             )
           }
