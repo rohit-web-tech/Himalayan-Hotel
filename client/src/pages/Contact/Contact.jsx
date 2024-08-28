@@ -3,9 +3,9 @@ import Location from "./location/Location";
 import ContactForm from "./contactForm/ContactForm";
 import ContentWrapper from "../../components/contentWrapper/ContentWrapper";
 import Loader from "../../components/loader";
+import { fetchGetData } from "../../lib/fetchData";
 
 export default function ContactPage() {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState({
     contact: "",
@@ -16,10 +16,9 @@ export default function ContactPage() {
 
   const getData = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/getContact`);
-      const data = await res.json();
-      if (data.message == "success") {
-        setData(data?.contact || {
+      const res = await fetchGetData(`/getContact`,setLoading);
+      if (res.message == "success") {
+        setData(res?.contact || {
           contact: "",
           email: "",
           address: "",
@@ -32,8 +31,7 @@ export default function ContactPage() {
   }
 
   useEffect(() => {
-    setLoading(true)
-    getData().finally(() => setLoading(false))
+    getData();
   }, [])
 
   return (

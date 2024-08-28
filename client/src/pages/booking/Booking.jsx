@@ -6,6 +6,7 @@ import ContentWrapper from '../../components/contentWrapper/ContentWrapper';
 import moment from 'moment';
 import NoData from '../../components/NoData';
 import { useNavigate } from 'react-router-dom';
+import { fetchGetData } from '../../lib/fetchData';
 const Booking = () => {
   const [rooms, setRooms] = useState([]);
   const [roomSearch, setRoomSearch] = useState("");
@@ -23,7 +24,7 @@ const Booking = () => {
       "fromDate": !dates ? "" : moment(dates[0]?.format("DD-MMM-YYYY"))._i,
       "toDate": !dates ? "" : moment(dates[1]?.format("DD-MMM-YYYY"))._i
     })
-    
+
     let fromDate = moment(dates[0]?.format("DD-MMM-YYYY"))._i;
     let toDate = moment(dates[1]?.format("DD-MMM-YYYY"))._i;
 
@@ -68,16 +69,11 @@ const Booking = () => {
 
 
   useEffect(() => {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
-    setLoading(true);
-    fetch(`${BASE_URL}/getRooms`)
-      .then(res => res.json())
-      .then(res => {
-        setRooms(res);
-        setDuplicateRooms(res);
-      })
-      .catch(err => console.log(err))
-      .finally(()=>setLoading(false))
+    (async () => {
+      const res = await fetchGetData(`/getRooms`, setLoading);
+      setRooms(res);
+      setDuplicateRooms(res);
+    })()
   }, [])
 
   let handleRoomSearch = (e) => {
@@ -124,18 +120,18 @@ const Booking = () => {
                   <Skeleton />
                 </>
               ) : rooms?.length < 1 ? (
-                <NoData 
+                <NoData
                   title="No room available"
                   btnText='Go back to home'
-                  btnHandler={()=>navigate("/")}
+                  btnHandler={() => navigate("/")}
                 />
-              ): (
+              ) : (
                 rooms.length >= 1 && rooms?.filter(item => item?.roomName?.toLowerCase().includes(roomSearch?.toLowerCase()))
                   .length < 1 ? (
-                  <NoData 
-                   title={`No room found for ${roomSearch}`}
-                   btnHandler={()=>setRoomSearch("")}
-                   btnText="Show All Rooms"
+                  <NoData
+                    title={`No room found for ${roomSearch}`}
+                    btnHandler={() => setRoomSearch("")}
+                    btnText="Show All Rooms"
                   />
                 ) :
                   rooms?.filter(item => item?.roomName?.toLowerCase()?.includes(roomSearch.toLowerCase()))

@@ -3,104 +3,76 @@ import Table, { TD, TR } from './Table'
 import Header from './Header';
 import { message } from "antd";
 import RoomForm from './form/RoomForm';
+import Loader from './loader';
+import NoData from './NoData';
+import { fetchData, fetchGetData } from '../lib/fetchData';
 
 const Rooms = () => {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const [rooms, setRooms] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
     const [editRoomData, seteditRoomData] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getrooms = async () => {
-        fetch(`${BASE_URL}/getRooms`)
-            .then(res => res.json())
-            .then(res => {
-                    console.log(res)
-                    setRooms(res || []);
-            }).catch(err => console.log(err));
+        const res = await fetchGetData("/getRooms", setLoading);
+        setRooms(res || []);
     }
 
     useEffect(() => {
         getrooms();
     }, [])
 
-    const addNewRoom = (room) => {
-        console.log(room)
-        if (!room?.roomName || !room?.roomRent || !room?.maxCount || !room?.room_id || !room?.imageUrls) {
-            message.warning("Please fill all the fields!!");
-            return;
-        }
-        fetch(`${BASE_URL}/setRoomData`, {
-            "method": "POST",
-            "body": JSON.stringify(room),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("Room added successfully!!");
-                    setTimeout(() => {
-                        getrooms();
-                        closeForm();
-                    }, 1000)
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            })
-    }
-
-    const editRoom = (room) => {
+    const addNewRoom = async (room) => {
         if (!room?.roomName || !room?.roomRent || !room?.maxCount || !room?.room_id || !room?.imageUrls) {
             message.warning("Please fill all the fields!!");
             return;
         }
 
-        fetch(`${BASE_URL}/editRoom`, {
-            "method": "PATCH",
-            "body": JSON.stringify(room),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("Room details edited successfully!!");
-                    setTimeout(() => {
-                        getrooms();
-                        closeForm();
-                    }, 1000)
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            })
+        const res = await fetchData("/setRoomData", setFormSubmitLoading, "POST", room);
+        if (res.message == "success") {
+            message.success("Room added successfully!!");
+            setTimeout(() => {
+                getrooms();
+                closeForm();
+            }, 1000)
+        } else {
+            message.error(res.message);
+        }
+
     }
 
-    const deleteRoom = (room) => {
+    const editRoom = async (room) => {
+        if (!room?.roomName || !room?.roomRent || !room?.maxCount || !room?.room_id || !room?.imageUrls) {
+            message.warning("Please fill all the fields!!");
+            return;
+        }
+
+        const res = await fetchData("/editRoom", setFormSubmitLoading, "PATCH", room);
+        if (res.message == "success") {
+            message.success("Room details edited successfully!!");
+            setTimeout(() => {
+                getrooms();
+                closeForm();
+            }, 1000)
+        } else {
+            message.error(res.message);
+        }
+    }
+
+    const deleteRoom = async(room) => {
         const userConfirmation = confirm(`Are you sure, you want to delete ${room?.roomName || "Room"} ?`);
 
-        if(!userConfirmation) return ;
-        fetch(`${BASE_URL}/deleteRoom`, {
-            "method": "delete",
-            "body": JSON.stringify(room),
-            "headers": {
-                "content-type": "application/json"
-            }
-        }).then(res => res.json())
-            .then(res => {
-                if (res.message == "success") {
-                    message.success("Room details deleted successfully!!");
-                    getrooms();
-                } else {
-                    message.error(res.message);
-                }
-            }).catch(err => {
-                message.error(err);
-            })
+        if (!userConfirmation) return;
+
+        const res = await fetchData("/deleteRoom", setFormSubmitLoading, "DELETE", room);
+        if (res.message == "success") {
+            message.success("Room details deleted successfully!!");
+            getrooms();
+        } else {
+            message.error(res.message);
+        }
     }
 
     const closeForm = () => {
@@ -149,26 +121,38 @@ const Rooms = () => {
     return (
         <div className='flex flex-col  w-full md:w-[calc(100%-300px)]  min-h-screen sm:px-14 px-6 py-3'>
             {
-                !showForm ? (
-                    <>
-                        <Header
-                            title="Rooms"
-                            handleBtn={() => {
-                                setShowForm(true);
-                            }}
-                            btnText="Add new room"
-                        />
-                        <Table tableFields={tableFeilds} tableRows={rowData} />
-                    </>
-                ) : (
-                    <RoomForm
-                        title="Add new room"
-                        edit={editForm}
-                        initialUserData={editRoomData}
-                        goBackHandler={closeForm}
-                        submitHandler={editForm ? editRoom : addNewRoom}
-                    />
-                )
+                loading ? (
+                    <Loader styles="h-10 w-10 my-[calc(50vh-40px)]" />
+                ) :
+                    rooms?.length < 1 ? (
+                        <div className='h-screen flex justify-center items-center'>
+                            <NoData
+                                title='No Room Data found !!'
+                            />
+                        </div>
+                    ) : (
+                        !showForm ? (
+                            <>
+                                <Header
+                                    title="Rooms"
+                                    handleBtn={() => {
+                                        setShowForm(true);
+                                    }}
+                                    btnText="Add new room"
+                                />
+                                <Table tableFields={tableFeilds} tableRows={rowData} />
+                            </>
+                        ) : (
+                            <RoomForm
+                                title="Add new room"
+                                edit={editForm}
+                                initialUserData={editRoomData}
+                                goBackHandler={closeForm}
+                                submitHandler={editForm ? editRoom : addNewRoom}
+                                loading={formSubmitLoading}
+                            />
+                        )
+                    )
             }
 
         </div>

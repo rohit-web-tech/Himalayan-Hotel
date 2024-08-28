@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import {message} from 'antd' ;
+import { message } from 'antd';
 import Loader from '../../components/loader';
+import { fetchData } from '../../lib/fetchData';
+import InputBox from '../../components/InputBox';
 const Login = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
@@ -15,30 +17,19 @@ const Login = () => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   }
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (userData.userPassword != "" && userData.userEmail != "") {
-      setLoading(true);
-      fetch(`${BASE_URL}/loginUser`, {
-        "method": "POST",
-        "body": JSON.stringify(userData),
-        "headers": {
-          "content-type": "application/json"
-        }
-      }).then(res => res.json())
-        .then(res => {
-          if (res.message == "success") {
-            localStorage.setItem("akhoteluser", JSON.stringify(res[0]))
-            message.success('Logged in successfully!!');
-            setUserData(({ userEmail: "", userPassword: "" }))
-            navigate("/");
-          } else {
-            message.error('Invalid Email or Password');
-          }
-        }).catch(err => {
-          console.log("Error encountered!!");
-          message.error(err);
-        }).finally(()=> setLoading(false))
+
+      const res = await fetchData(`/loginUser`, setLoading, "POST", userData);
+      if (res.message == "success") {
+        localStorage.setItem("akhoteluser", JSON.stringify(res[0]))
+        message.success('Logged in successfully!!');
+        setUserData(({ userEmail: "", userPassword: "" }))
+        navigate("/");
+      } else {
+        message.error('Invalid Email or Password');
+      }
     } else {
       message.warning('Please fill all the fields!!');
       return;
@@ -57,26 +48,24 @@ const Login = () => {
 
             <div className="mt-8 space-y-8">
               <div className="space-y-6">
-                <input
-                  onChange={handleUserInput}
+                <InputBox
+                  handleChange={handleUserInput}
                   value={userData.userEmail}
-                  className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500"
                   placeholder="Your Email"
                   type="email"
                   name="userEmail"
-                  id="email" />
-                <input
-                  onChange={handleUserInput}
+                />
+                <InputBox
+                  handleChange={handleUserInput}
                   value={userData.userPassword}
-                  className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500 "
-                  placeholder="Your Password"
+                  placeholder="Your Email"
                   type="password"
                   name="userPassword"
-                  id="password" />
+                />
               </div>
 
               <button onClick={handleLogin} className={`h-9 px-3 w-full ${loading ? "bg-slate-300" : "bg-[--primary-color]"} hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm`}>
-                {loading ? <Loader styles='h-6 w-6'/> : "Login"}
+                {loading ? <Loader styles='h-6 w-6' /> : "Login"}
               </button>
             </div>
           </div>

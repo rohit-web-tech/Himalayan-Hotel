@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { message } from 'antd';
 import Loader from '../../components/loader';
+import { fetchData } from '../../lib/fetchData';
+import InputBox from '../../components/InputBox';
 
 const Signup = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -18,34 +20,23 @@ const Signup = () => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   }
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     //checking for blank input
     if (userData.userName != "" && userData.userPassword != "" && userData.userEmail != "" && userData.userNumber != "") {
       //checking for a valid mobile number
       if (userData.userNumber.length === 10) {
-        setLoading(true);
-        fetch(`${BASE_URL}/registerUser`, {
-          "method": "POST",
-          "body": JSON.stringify(userData),
-          "headers": {
-            "content-type": "application/json"
-          }
-        }).then(res => res.json())
-          .then(res => {
-            console.log(res)
-            if (res.message == "success") {
-              localStorage.setItem("akhoteluser", JSON.stringify(res?._doc))
-              message.success("Sign Up Successfully!!");
-              setUserData(({ userName: "", userNumber: "", userEmail: "", userPassword: "" }))
-              navigate("/");
-            } else {
-              message.error(res.message);
-            }
-          }).catch(err => {
-            console.log("Error encountered!!");
-            message.error(err);
-          }).finally(()=> setLoading(false))
+        const res = await fetchData(`/registerUser`, setLoading, "POST", userData)
+
+        if (res.message == "success") {
+          localStorage.setItem("akhoteluser", JSON.stringify(res?._doc))
+          message.success("Sign Up Successfully!!");
+          setUserData(({ userName: "", userNumber: "", userEmail: "", userPassword: "" }))
+          navigate("/");
+        } else {
+          message.error(res.message);
+        }
+
       } else {
         message.warning("Please Enter a Valid Indian Mobile Number without Country Code(+91)!!")
       }
@@ -67,41 +58,38 @@ const Signup = () => {
 
             <div className="mt-8 space-y-8">
               <div className="space-y-6">
-                <input
-                  onChange={handleUserInput}
+                <InputBox
+                  handleChange={handleUserInput}
                   value={userData.userName}
-                  className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500"
                   placeholder="Your Name"
-                  type="text" name="userName"
-                  id="name" />
-                <input
-                  onChange={handleUserInput}
+                  type="text"
+                  name="userName"
+                />
+                <InputBox
+                  handleChange={handleUserInput}
                   value={userData.userEmail}
-                  className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500"
                   placeholder="Your Email"
                   type="email"
                   name="userEmail"
-                  id="email" />
-                <input
-                  onChange={handleUserInput}
+                />
+                <InputBox
+                  handleChange={handleUserInput}
                   value={userData.userNumber}
-                  className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500"
                   placeholder="Your Contact Number"
                   type="number"
                   name="userNumber"
-                  id="number" />
-                <input
-                  onChange={handleUserInput}
+                />
+                <InputBox
+                  handleChange={handleUserInput}
                   value={userData.userPassword}
-                  className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500"
                   placeholder="Your Password"
                   type="password"
                   name="userPassword"
-                  id="password" />
+                />
               </div>
 
               <button onClick={handleSignUp} className={`h-9 px-3 w-full ${loading ? "bg-slate-300" : "bg-[--primary-color]"} hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm`}>
-                {loading ? <Loader styles='h-6 w-6'/> : "Register"}
+                {loading ? <Loader styles='h-6 w-6' /> : "Register"}
               </button>
             </div>
           </div>
