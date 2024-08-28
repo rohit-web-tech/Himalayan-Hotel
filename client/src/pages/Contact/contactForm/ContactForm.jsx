@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import './style.css';
 import { message } from 'antd';
+import { fetchData } from '../../../lib/fetchData';
 
 export default function ContactForm() {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const [loading, setLoading] = useState(false);
     const [userInfo, setUserInfo] = useState({
         name: "",
@@ -12,7 +12,7 @@ export default function ContactForm() {
         email: ""
     });
 
-    const handleMessageSubmit = (e) => {
+    const handleMessageSubmit = async(e) => {
         e.preventDefault();
         if (loading) {
             message.open({
@@ -21,38 +21,19 @@ export default function ContactForm() {
             })
         } else {
             if (userInfo?.name && userInfo?.contact && userInfo?.message && userInfo?.email) {
-                setLoading(true);
-                fetch(`${BASE_URL}/enquiry`, {
-                    "method": "POST",
-                    "body": JSON.stringify(userInfo),
-                    "headers": {
-                        "content-type": "application/json"
-                    }
+
+                const res = await fetchData(`/enquiry`, setLoading, "POST", userInfo);
+                if (res.message === "success") {
+                    message.success("Thanks for your message we'll contact you back soon.")
+                } else {
+                    message.success(res.message)
+                }
+                setUserInfo({
+                    name: "",
+                    contact: "",
+                    message: "",
+                    email: ""
                 })
-                    .then(res => {
-                        setLoading(false);
-                        console.log(res)
-                        if (res.message === "success") {
-                            message.success("Thanks for your message we'll contact you back soon.")
-                        } else {
-                            message.success(res.message)
-                        }
-                        setUserInfo({
-                            name: "",
-                            contact: "",
-                            message: "",
-                            email: ""
-                        });
-                    }).catch(err => {
-                        setLoading(false);
-                        message.success(err)
-                        setUserInfo({
-                            name: "",
-                            contact: "",
-                            message: "",
-                            email: ""
-                        });
-                    })
             } else {
                 message.warning("Please fill all the fields");
             }

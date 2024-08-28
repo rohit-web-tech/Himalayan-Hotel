@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import {message} from 'antd' ;
+import { message } from 'antd';
 import Loader from '../../components/loader';
+import { fetchData } from '../../lib/fetchData';
 const Login = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
@@ -15,30 +16,19 @@ const Login = () => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   }
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (userData.userPassword != "" && userData.userEmail != "") {
-      setLoading(true);
-      fetch(`${BASE_URL}/loginUser`, {
-        "method": "POST",
-        "body": JSON.stringify(userData),
-        "headers": {
-          "content-type": "application/json"
-        }
-      }).then(res => res.json())
-        .then(res => {
-          if (res.message == "success") {
-            localStorage.setItem("akhoteluser", JSON.stringify(res[0]))
-            message.success('Logged in successfully!!');
-            setUserData(({ userEmail: "", userPassword: "" }))
-            navigate("/");
-          } else {
-            message.error('Invalid Email or Password');
-          }
-        }).catch(err => {
-          console.log("Error encountered!!");
-          message.error(err);
-        }).finally(()=> setLoading(false))
+
+      const res = await fetchData(`/loginUser`, setLoading, "POST", userData);
+      if (res.message == "success") {
+        localStorage.setItem("akhoteluser", JSON.stringify(res[0]))
+        message.success('Logged in successfully!!');
+        setUserData(({ userEmail: "", userPassword: "" }))
+        navigate("/");
+      } else {
+        message.error('Invalid Email or Password');
+      }
     } else {
       message.warning('Please fill all the fields!!');
       return;
@@ -76,7 +66,7 @@ const Login = () => {
               </div>
 
               <button onClick={handleLogin} className={`h-9 px-3 w-full ${loading ? "bg-slate-300" : "bg-[--primary-color]"} hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm`}>
-                {loading ? <Loader styles='h-6 w-6'/> : "Login"}
+                {loading ? <Loader styles='h-6 w-6' /> : "Login"}
               </button>
             </div>
           </div>

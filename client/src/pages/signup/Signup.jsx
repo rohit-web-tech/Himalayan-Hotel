@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { message } from 'antd';
 import Loader from '../../components/loader';
+import { fetchData } from '../../lib/fetchData';
 
 const Signup = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -18,34 +19,23 @@ const Signup = () => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   }
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     //checking for blank input
     if (userData.userName != "" && userData.userPassword != "" && userData.userEmail != "" && userData.userNumber != "") {
       //checking for a valid mobile number
       if (userData.userNumber.length === 10) {
-        setLoading(true);
-        fetch(`${BASE_URL}/registerUser`, {
-          "method": "POST",
-          "body": JSON.stringify(userData),
-          "headers": {
-            "content-type": "application/json"
-          }
-        }).then(res => res.json())
-          .then(res => {
-            console.log(res)
-            if (res.message == "success") {
-              localStorage.setItem("akhoteluser", JSON.stringify(res?._doc))
-              message.success("Sign Up Successfully!!");
-              setUserData(({ userName: "", userNumber: "", userEmail: "", userPassword: "" }))
-              navigate("/");
-            } else {
-              message.error(res.message);
-            }
-          }).catch(err => {
-            console.log("Error encountered!!");
-            message.error(err);
-          }).finally(()=> setLoading(false))
+        const res = await fetchData(`/registerUser`, setLoading, "POST", userData)
+
+        if (res.message == "success") {
+          localStorage.setItem("akhoteluser", JSON.stringify(res?._doc))
+          message.success("Sign Up Successfully!!");
+          setUserData(({ userName: "", userNumber: "", userEmail: "", userPassword: "" }))
+          navigate("/");
+        } else {
+          message.error(res.message);
+        }
+        
       } else {
         message.warning("Please Enter a Valid Indian Mobile Number without Country Code(+91)!!")
       }
@@ -101,7 +91,7 @@ const Signup = () => {
               </div>
 
               <button onClick={handleSignUp} className={`h-9 px-3 w-full ${loading ? "bg-slate-300" : "bg-[--primary-color]"} hover:bg-gray-700 transition duration-500 rounded-md text-white text-sm`}>
-                {loading ? <Loader styles='h-6 w-6'/> : "Register"}
+                {loading ? <Loader styles='h-6 w-6' /> : "Register"}
               </button>
             </div>
           </div>

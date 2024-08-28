@@ -14,11 +14,11 @@ import {
 import { MdEmail } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import NavBtn from "./NavBtn";
+import { fetchGetData } from "../../lib/fetchData";
 
 const Navbar = () => {
   const [showSideNav, setShowSideNav] = useState(false);
   const navigate = useNavigate();
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const [data, setData] = useState({
     contact: "",
     email: "",
@@ -27,18 +27,15 @@ const Navbar = () => {
   })
 
   const getData = async () => {
-    fetch(`${BASE_URL}/getContact`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.message == "success") {
-          setData(res?.contact || {
-            contact: "",
-            email: "",
-            address: "",
-            imageUrl: ""
-          });
-        }
-      }).catch(err => console.log(err));
+    const res = await fetchGetData(`/getContact`)
+    if (res.message == "success") {
+      setData(res?.contact || {
+        contact: "",
+        email: "",
+        address: "",
+        imageUrl: ""
+      });
+    }
   }
 
   useEffect(() => {

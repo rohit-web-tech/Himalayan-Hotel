@@ -3,32 +3,26 @@ import ContentWrapper from '../../components/contentWrapper/ContentWrapper'
 import { useNavigate } from 'react-router-dom';
 import NoData from '../../components/NoData';
 import Loader from '../../components/loader';
+import { fetchData } from '../../lib/fetchData';
+import { message } from 'antd';
 
 const MyOrders = () => {
     const navigate = useNavigate();
     const [bookings, setBookings] = useState([]);
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const user = localStorage.getItem("akhoteluser");
     const [loading, setLoading] = useState(true)
     const loggedInUser = user ? JSON.parse(user) : { userName: "Guest" };
 
     const handleLogOut = () => {
-        if(!confirm("Are you sure, you want to log out ?")) return ;
+        if (!confirm("Are you sure, you want to log out ?")) return;
         localStorage.removeItem("akhoteluser");
         navigate("/login");
     }
 
     const getData = async () => {
         try {
-            const res = await fetch(`${BASE_URL}/getUserBookings`, {
-                "method": "POST",
-                "body": JSON.stringify({ userId: loggedInUser?._id }),
-                "headers": {
-                    "content-type": "application/json"
-                }
-            });
-            const data = await res.json();
-            setBookings(data?.bookings?.reverse() || []);
+            const res = await fetchData(`/getUserBookings`, setLoading, "POST", { userId: loggedInUser?._id });
+            setBookings(res?.bookings?.reverse() || []);
         } catch (error) {
             console.log(error);
         }
@@ -36,8 +30,7 @@ const MyOrders = () => {
     console.log(bookings);
 
     useEffect(() => {
-        setLoading(true);
-        getData().finally(() => setLoading(false))
+        getData();
     }, [])
     return (
         <ContentWrapper>
@@ -95,14 +88,9 @@ const MyOrders = () => {
                                                                 <span className="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Actions</span>
                                                                 <p className="hover:text-blue-600 hover:cursor-pointer pl-6 text-center underline text-blue-400" onClick={() => {
                                                                     if (booking?.status == "booked") {
-                                                                        fetch(`${BASE_URL}/cancelBooking`, {
-                                                                            "method": "POST",
-                                                                            "body": JSON.stringify({ bookingId: booking?._id }),
-                                                                            "headers": {
-                                                                                "content-type": "application/json"
-                                                                            }
-                                                                        }).then(res => res.json())
+                                                                        fetchData(`/cancelBooking`, () => { }, "POST", { bookingId: booking?._id })
                                                                             .then(res => {
+                                                                                message.success("Booking cancelled successfully!!")
                                                                                 setBookings(res?.reverse());
                                                                             }).catch(err => console.log(err))
                                                                     }

@@ -2,22 +2,15 @@ import { useEffect, useState } from 'react'
 import Table, { TD, TR } from './Table'
 import Loader from './loader';
 import NoData from './NoData';
+import {fetchGetData} from "../lib/fetchData.js"
 
 const Bookings = () => {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const getBookings = async () => {
-        setLoading(true)
-        fetch(`${BASE_URL}/allBookings`)
-            .then(res => res.json())
-            .then(res => {
-                setBookings(res?.bookings)
-            }).catch(err => console.log(err))
-            .finally(() => {
-                setLoading(false)
-            })
+        const res = await fetchGetData(`/allBookings`,setLoading)
+        setBookings(res?.bookings)
     }
 
     useEffect(() => {

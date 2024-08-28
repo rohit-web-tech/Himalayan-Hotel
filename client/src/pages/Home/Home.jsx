@@ -3,10 +3,9 @@ import HeroBanner from "./heroBanner/HeroBanner";
 import About from "../About/AboutUsContent/AboutUsContent";
 import image from "../../assets/about.jpg";
 import Loader from "../../components/loader";
-
+import {fetchGetData} from "../../lib/fetchData.js";
 
 const Home = () => {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const [loading, setLoading] = useState(true)
   const [heroBannerData, setHeroBannerData] = useState({
     title: "",
@@ -21,10 +20,9 @@ const Home = () => {
 
   const getAboutData = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/getAbout`);
-      const data = await res.json();
-      if (data.message == "success") {
-        setAboutData(data?.about || {
+      const res = await fetchGetData(`/getAbout`);
+      if (res.message == "success") {
+        setAboutData(res?.about || {
           title: "",
           description: "",
           imageUrl: ""
@@ -37,10 +35,9 @@ const Home = () => {
 
   const getHeroBannerData = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/getHome`);
-      const data = await res.json();
-      if (data.message == "success") {
-        setHeroBannerData(data?.home || {
+      const res = await fetchGetData(`/getHome`);
+      if (res.message == "success") {
+        setHeroBannerData(res?.home || {
           title: "",
           subtitle: "",
           imageUrl: ""
