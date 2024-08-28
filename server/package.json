@@ -6,20 +6,23 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev" : "nodemon server.js"
+    "dev": "nodemon server.js"
   },
   "author": "Rohit",
   "license": "ISC",
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "cron": "^3.1.6",
     "dotenv": "^16.3.1",
     "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
     "mongoose": "^6.10.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.7",
-    "twilio": "^4.19.0"
+    "twilio": "^4.19.0",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

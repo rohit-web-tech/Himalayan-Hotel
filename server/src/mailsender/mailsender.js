@@ -26,7 +26,6 @@ export async function sendPreAlertMail(date) {
     if (bookings.length > 0) {
         bookings.forEach(booking => {
             if (booking.status === "booked") {
-                console.log("checking out");
                 let mailOptions = {
                     from: process.env.myEmail,
                     to: booking.userEmail,

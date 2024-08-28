@@ -1,31 +1,32 @@
 import mongoose from "mongoose";
 
 const roomSchema = mongoose.Schema({
-    room_id : {
-        type : Number ,
-        require : true
-    },
     roomName:{
         type : String,
         require : true 
     },
-    roomRent : {
+    rent : {
         type : Number ,
         require : true 
     },
-    maxCount : {
-        type : Number ,
-        require : true 
-    },
-    imageUrls : {
+    imageUrls : [{
         type : String ,
         require : true 
+    }],
+    availableRooms : {
+        type : Number ,
+        default : 0 ,
+        require : true 
     },
-    currentBookings : []
+    totalRooms : {
+        type : Number ,
+        default : 0 ,
+        require : true 
+    }
 },{
     timestamps : true 
 })
 
-const roomModel = mongoose.model("rooms",roomSchema) ;
+const Room = mongoose.model("Room",roomSchema) ;
 
-export default roomModel ;
+export default Room ;

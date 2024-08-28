@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
-const homeSchema = mongoose.Schema({
+const aboutSchema = mongoose.Schema({
     title : {
         type : String ,
         require : true
     },
-    subtitle:{
+    description:{
         type : String,
         require : true 
     },
@@ -17,6 +17,6 @@ const homeSchema = mongoose.Schema({
     timestamps : true 
 })
 
-const homeModel = mongoose.model("Home",homeSchema) ;
+const About = mongoose.model("About",aboutSchema) ;
 
-export default homeModel ;
+export default About ;

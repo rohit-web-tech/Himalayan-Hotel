@@ -1,15 +1,11 @@
 import mongoose from "mongoose";
 
-const contactSchema = mongoose.Schema({
-    contact : {
+const homeSchema = mongoose.Schema({
+    title : {
         type : String ,
         require : true
     },
-    email:{
-        type : String,
-        require : true 
-    },
-    address:{
+    subtitle:{
         type : String,
         require : true 
     },
@@ -21,6 +17,6 @@ const contactSchema = mongoose.Schema({
     timestamps : true 
 })
 
-const contactModel = mongoose.model("Contact",contactSchema) ;
+const Home = mongoose.model("Home",homeSchema) ;
 
-export default contactModel ;
+export default Home ;

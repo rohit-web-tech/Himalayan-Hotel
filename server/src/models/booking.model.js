@@ -1,28 +1,12 @@
 import mongoose from "mongoose";
 
 const bookingSchema = mongoose.Schema({
-    room_id : { 
-        type : Number ,
+    room : { 
+        ref : "Room" ,
         require : true 
     },
-    imageUrl : {
-        type : String,
-        required : true 
-    },
-    roomName : {
-        type : String ,
-        require : true 
-    },
-    userId : {
-        type : String ,
-        require : true 
-    },
-    userName : {
-        type : String ,
-        require : true 
-    },
-    userEmail : {
-        type : String ,
+    user : {
+        ref : "User" ,
         require : true 
     },
     fromDate : {
@@ -44,12 +28,13 @@ const bookingSchema = mongoose.Schema({
     status : {
         type : String , 
         require : true ,
+        Enum : ["booked","cancelled","checked out"] ,
         default : "booked"
     }
 },{
     timestamps : true 
 })
 
-const bookingModel = mongoose.model("bookings",bookingSchema) ;
+const Booking = mongoose.model("Booking",bookingSchema) ;
 
-export default bookingModel ;
+export default Booking ;
