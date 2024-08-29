@@ -3,7 +3,7 @@ import { getContact, setContact } from "../controllers/contact.controller.js";
 import {auth,adminAuth} from "../middlewares/auth.middleware.js";
 const router = express.Router();
 
-router.route("/contact")
+router.route("/")
 .get(getContact)
 .post(auth,adminAuth,setContact)
 

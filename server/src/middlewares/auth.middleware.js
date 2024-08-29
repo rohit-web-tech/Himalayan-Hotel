@@ -4,18 +4,22 @@ import {decodeToken} from "../lib/token.js";
 import User from "../models/user.model.js";
 
 const auth = asyncHandler(async(req,_,next)=>{
-    const accessToken = req.cookies("AccessToken") || req.headers.authorization.replace("Bearer ","");
+    const accessToken = req?.cookies?.AccessToken || req?.headers?.authorization?.replace("Bearer ","");
 
     if(!accessToken) {
-        throw new ApiError(401,"Unautherized request !!");
+        throw new ApiError(401,"Unauthorized request !!");
     }
 
-    const userId = await decodeToken(accessToken);
+    const currentUser = await decodeToken(accessToken);
 
-    const user = await User.findById(userId).select("-password -emailVerificationToken -refreshToken -emailVerificationTokenExpiry -forgetPasswordToken -forgetPasswordTokenExpiry");
+    if(!currentUser) {
+        throw new ApiError(401,"Unauthorized request !!");
+    }
+
+    const user = await User.findById(currentUser?._id).select("-password -emailVerificationToken -refreshToken -emailVerificationTokenExpiry -forgetPasswordToken -forgetPasswordTokenExpiry");
 
     if(!user){
-        throw new ApiError(401,"Unautherized request !!");
+        throw new ApiError(401,"Unauthorized request !!");
     }
 
     req.user = user ;
@@ -27,7 +31,7 @@ const adminAuth = asyncHandler(async(req,_,next)=>{
     const user = req.user ;
 
     if(!user || !user.isAdmin){
-        throw new ApiError(401,"Unautherized request !!");
+        throw new ApiError(401,"Unauthorized request !!");
     }
 
     next();
