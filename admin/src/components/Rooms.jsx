@@ -31,7 +31,7 @@ const Rooms = () => {
         }
 
         const res = await fetchData("/setRoomData", setFormSubmitLoading, "POST", room);
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("Room added successfully!!");
             setTimeout(() => {
                 getrooms();
@@ -50,7 +50,7 @@ const Rooms = () => {
         }
 
         const res = await fetchData("/editRoom", setFormSubmitLoading, "PATCH", room);
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("Room details edited successfully!!");
             setTimeout(() => {
                 getrooms();
@@ -67,7 +67,7 @@ const Rooms = () => {
         if (!userConfirmation) return;
 
         const res = await fetchData("/deleteRoom", setFormSubmitLoading, "DELETE", room);
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("Room details deleted successfully!!");
             getrooms();
         } else {

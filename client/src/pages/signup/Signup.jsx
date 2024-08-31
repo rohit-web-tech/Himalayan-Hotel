@@ -6,7 +6,6 @@ import { fetchData } from '../../lib/fetchData';
 import InputBox from '../../components/InputBox';
 
 const Signup = () => {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
@@ -28,7 +27,7 @@ const Signup = () => {
       if (userData.userNumber.length === 10) {
         const res = await fetchData(`/registerUser`, setLoading, "POST", userData)
 
-        if (res.message == "success") {
+        if (res?.success) {
           localStorage.setItem("akhoteluser", JSON.stringify(res?._doc))
           message.success("Sign Up Successfully!!");
           setUserData(({ userName: "", userNumber: "", userEmail: "", userPassword: "" }))

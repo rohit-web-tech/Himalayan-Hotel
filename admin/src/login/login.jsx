@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     if (adminDetails.userName != "" && adminDetails.password != "") {
       const res = await fetchData("/adminLogin", setLoading, "POST", adminDetails);
-      if (res.message === "success") {
+      if (res?.success) {
         localStorage.setItem("akhoteladmin", JSON.stringify(res))
         navigate("/");
       } else {

@@ -17,7 +17,7 @@ const User = () => {
 
     const getUsers = async () => {
         const res = await fetchGetData("/allUsers", setLoading);
-        if (res.message === "success") {
+        if (res?.success) {
             console.log(res)
             setUsers(res?.users || []);
         }
@@ -33,7 +33,7 @@ const User = () => {
             return;
         }
         const res = await fetchData("/registerUser", setFormSubmitLoading, "POST", user);
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("User registered successfully!!");
             setTimeout(() => {
                 getUsers();
@@ -50,7 +50,7 @@ const User = () => {
             return;
         }
         const res = await fetchData("/editUser", setFormSubmitLoading, "PATCH", user);
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("User details edited successfully!!");
             setTimeout(() => {
                 getUsers();
@@ -67,7 +67,7 @@ const User = () => {
         if (!userConfirmation) return;
 
         const res = await fetchData("/deleteUser", setFormSubmitLoading, "DELETE", user);
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("User details deleted successfully!!");
             getUsers();
         } else {

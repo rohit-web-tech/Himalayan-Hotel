@@ -62,9 +62,7 @@ export const registerAdmin = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User already exist with same email !!");
     }
 
-    const newUser = await User.create({ name, email, password, contactNumber });
-
-    await sendEmailVerificationMail(name, email, token);
+    const newUser = await User.create({ name, email, password, contactNumber, isVerified: true, isAdmin: true });
 
     await newUser.save();
 
@@ -74,7 +72,7 @@ export const registerAdmin = asyncHandler(async (req, res) => {
             new ApiResponse(
                 201,
                 {},
-                "User created successfully!!",
+                "Admin created successfully!!",
             )
         )
 
@@ -134,7 +132,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User doesn't exist with this email!!");
     }
 
-    if(!(user.isVerified)){
+    if (!(user.isVerified)) {
         throw new ApiError(400, "Email is not verified, please verify your email first to login!!");
     }
 
@@ -146,18 +144,213 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     const [AccessToken, RefreshToken] = await generateAccessAndRefeshTokens(user);
 
-    user.refreshToken = RefreshToken ;
+    user.refreshToken = RefreshToken;
 
-    res 
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                { user, AccessToken, RefreshToken },
+                "You are logged in successfully!!"
+            )
+        )
+        .cookie("AccessToken", AccessToken, options)
+        .cookie("RefreshToken", RefreshToken, options)
+
+})
+
+export const loginAdmin = asyncHandler(async (req, res) => {
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        throw new ApiError(400, "All fields are required !!");
+    }
+
+    const admin = await User.findOne({
+        email,
+        isAdmin: true
+    }).select("-password -emailVerificationTokenExpiry - emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
+
+    if (!admin) {
+        throw new ApiError(400, "Please login with right credentials!!");
+    }
+
+    const isPasswordCorrect = await admin.isPasswordCorrect();
+
+    if (!isPasswordCorrect) {
+        throw new ApiError(400, "Please login with right credentials!!");
+    }
+
+    const [AccessToken, RefreshToken] = await generateAccessAndRefeshTokens(admin);
+
+    admin.refreshToken = RefreshToken;
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                { admin, AccessToken, RefreshToken },
+                "You are logged in successfully!!"
+            )
+        )
+        .cookie("AccessToken", AccessToken, options)
+        .cookie("RefreshToken", RefreshToken, options)
+
+})
+
+export const getAllUsers = asyncHandler(async () => {
+
+    const users = await User.find(
+        {
+            isVerified: true
+        }
+    ).select("-password -emailVerificationTokenExpiry - emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                users,
+                "Success!!"
+            )
+        );
+
+});
+
+export const getAllAdmins = asyncHandler(async () => {
+
+    const admins = await User.find(
+        {
+            isAdmin: true
+        }
+    ).select("-password -emailVerificationTokenExpiry - emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
+
+    res
     .status(200)
     .json(
         new ApiResponse(
             200,
-            {user , AccessToken, RefreshToken},
-            "You are logged in successfully!!"
+            admins,
+            "Success!!"
         )
     )
-    .cookie("AccessToken",AccessToken,options)
-    .cookie("RefreshToken",RefreshToken,options)
 
+});
+
+export const getCurrentUser = asyncHandler(async(req,res)=>{
+
+    res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            res?.user,
+            "User fetched successfully !!"
+        )
+    );
+
+});
+
+export const logout = asyncHandler(async(req,res)=>{
+
+    await User.findByIdAndUpdate(
+        {
+            _id: req?.user?._id
+        },
+        {
+            $unset: {
+                refreshToken: 1
+            }
+        }
+    )
+
+    res 
+    .status(200)
+    .json(
+        200,
+        {},
+        "You are logged out successfully !!"
+    )
+    .clearCookie("AccessToken",options)
+    .clearCookie("RefreshToken", options)
+
+})
+
+export const deleteUser = asyncHandler(async()=>{
+
+    const {userId} = req.body ;
+
+    if(!userId){
+        throw new ApiError(400,"UserId is required !!")
+    }
+
+    const user = await User.findByIdAndDelete(userId);
+
+    if(!user){
+        throw new ApiError(404,"User doesn't exist !!")
+    }
+
+    const allUsers = await User.find({isVerified:true});
+
+    res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            allUsers,
+            "User deleted successfully !!"
+        )
+    )
+
+})
+
+export const editUser = asyncHandler(async(req,res)=>{
+
+    const { name, email, password, contactNumber, userId } = req.body;
+
+    if (!name || !email || !password || !contactNumber) {
+        throw new ApiError(400, "All fields are required!!");
+    }
+
+    if(!userId){
+        throw new ApiError(400,"UserId is required !!")
+    }
+
+    const emailCheck = await User.findOne({
+        email,
+        _id :  { $ne : userId }
+    });
+
+    if (emailCheck) {
+        throw new ApiError(400, "Another user already exist with same email !!");
+    }
+
+    await User.findByIdAndUpdate(
+        userId ,
+        {
+            $set : {
+                name, 
+                email, 
+                password, 
+                contactNumber
+            }
+        }
+    );
+
+    const allUsers = await User.find({isVerified:true});
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                allUsers,
+                "User's details updated successfully !!"
+            )
+        )
+    
 })

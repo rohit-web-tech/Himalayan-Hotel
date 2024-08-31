@@ -16,9 +16,9 @@ const About = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getData = async () => {
-        const res = await fetchGetData("/getAbout", setLoading);
-        if (res.message == "success") {
-            setData(res?.about || {
+        const res = await fetchGetData("/about", setLoading);
+        if (res?.success) {
+            setData(res?.data || {
                 title: "",
                 description: "",
                 imageUrl: ""
@@ -36,7 +36,7 @@ const About = () => {
             return;
         }
 
-        const res = await fetchData("/setAbout", setFormSubmitLoading, "POST", data);
+        const res = await fetchData("/about", setFormSubmitLoading, "POST", data);
         if (res.message == "success") {
             message.success("About details edited successfully!!");
             setData(res?.about || {

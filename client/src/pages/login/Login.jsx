@@ -22,7 +22,7 @@ const Login = () => {
     if (userData.userPassword != "" && userData.userEmail != "") {
 
       const res = await fetchData(`/loginUser`, setLoading, "POST", userData);
-      if (res.message == "success") {
+      if (res?.success) {
         localStorage.setItem("akhoteluser", JSON.stringify(res[0]))
         message.success('Logged in successfully!!');
         setUserData(({ userEmail: "", userPassword: "" }))

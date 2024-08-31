@@ -27,7 +27,7 @@ const Room = (props) => {
         const fromDate = props.dates.fromDate, toDate = props.dates.toDate;
         setBookingLoading(true)
         const res = await fetchData(`/bookRoom`, setBookingLoading, "POST", { fromDate, toDate, userId: loggedInUser._id, roomId })
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("Room Booked Successfully!!");
             setShowBookRoom(false);
         } else {

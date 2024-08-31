@@ -16,10 +16,10 @@ const Home = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getData = async () => {
-        const data = await fetchGetData("/getHome", setLoading);
+        const data = await fetchGetData("/home", setLoading);
         console.log(data)
-        if (data.message == "success") {
-            setData(data?.home || {
+        if (data?.success) {
+            setData(data?.data || {
                 title: "",
                 subtitle: "",
                 imageUrl: ""
@@ -40,8 +40,8 @@ const Home = () => {
             return;
         }
 
-        const res = await fetchData("/setHome", setFormSubmitLoading ,"POST", data);
-        if (res?.message == "success") {
+        const res = await fetchData("/Home", setFormSubmitLoading ,"POST", data);
+        if (res?.success) {
             message.success("Home details edited successfully!!");
             setData(res?.home || {
                 title: "",

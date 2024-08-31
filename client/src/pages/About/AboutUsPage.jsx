@@ -14,9 +14,9 @@ const AboutUsPage = () => {
 
   const getAboutData = async () => {
     try {
-      const res = await fetchGetData(`/getAbout`,setLoading);
-      if (res.message == "success") {
-        setAboutData(res?.about || {
+      const res = await fetchGetData(`/about`,setLoading);
+      if (res?.success) {
+        setAboutData(res?.data || {
           title: "",
           description: "",
           imageUrl: ""

@@ -23,7 +23,7 @@ export default function ContactForm() {
             if (userInfo?.name && userInfo?.contact && userInfo?.message && userInfo?.email) {
 
                 const res = await fetchData(`/enquiry`, setLoading, "POST", userInfo);
-                if (res.message === "success") {
+                if (res?.success) {
                     message.success("Thanks for your message we'll contact you back soon.")
                 } else {
                     message.success(res.message)

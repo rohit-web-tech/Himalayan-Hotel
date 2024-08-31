@@ -20,9 +20,9 @@ const Home = () => {
 
   const getAboutData = async () => {
     try {
-      const res = await fetchGetData(`/getAbout`);
-      if (res.message == "success") {
-        setAboutData(res?.about || {
+      const res = await fetchGetData(`/about`);
+      if (res?.success) {
+        setAboutData(res?.data || {
           title: "",
           description: "",
           imageUrl: ""
@@ -35,9 +35,9 @@ const Home = () => {
 
   const getHeroBannerData = async () => {
     try {
-      const res = await fetchGetData(`/getHome`);
-      if (res.message == "success") {
-        setHeroBannerData(res?.home || {
+      const res = await fetchGetData(`/home`);
+      if (res?.success) {
+        setHeroBannerData(res?.data || {
           title: "",
           subtitle: "",
           imageUrl: ""

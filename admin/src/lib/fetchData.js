@@ -12,9 +12,10 @@ const fetchData = async (endPoint = "", setLoading = () => { }, method = "POST",
             }
         })
         const data = await res.json();
+        console.log(data)
         return data;
     } catch (error) {
-        message.error(error?.message);
+        console.log(error?.message);
     } finally {
         setLoading(false);
     }
@@ -29,7 +30,7 @@ const fetchGetData = async (endPoint = "", setLoading = () => { }) => {
         const data = await res.json();
         return data;
     } catch (error) {
-        message.error(error?.message);
+        console.log(error?.message);
     } finally {
         setLoading(false);
     }

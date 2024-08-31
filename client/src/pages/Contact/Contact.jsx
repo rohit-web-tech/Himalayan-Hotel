@@ -16,9 +16,9 @@ export default function ContactPage() {
 
   const getData = async () => {
     try {
-      const res = await fetchGetData(`/getContact`,setLoading);
-      if (res.message == "success") {
-        setData(res?.contact || {
+      const res = await fetchGetData(`/contact`,setLoading);
+      if (res?.success) {
+        setData(res?.data || {
           contact: "",
           email: "",
           address: "",
