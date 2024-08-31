@@ -25,7 +25,7 @@ router.route("/allAdmins").get(auth,adminAuth,getAllAdmins);
 router.route("/adminLogin").post(loginAdmin);
 router.route("/editUser").patch(auth,adminAuth,editUser);
 router.route("/deleteUser").delete(auth,adminAuth,deleteUser);
-router.route("/registerAdmin").post(registerAdmin);
+router.route("/registerAdmin").post(auth,adminAuth,registerAdmin);
 router.get("/currentUser").post(auth,getCurrentUser);
 router.post("/logout").post(auth,logout);
 
