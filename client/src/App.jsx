@@ -13,6 +13,7 @@ import AuthenticationRoutes from "./components/authenticationRoutes/Authenticati
 import MyOrders from "./pages/myorders/MyOrders";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import PageNotFound from "./components/404/PageNotFound";
+import VerifyEmail from "./components/VerifyEmail";
 
 function App() {
   return (
@@ -20,18 +21,19 @@ function App() {
       <Navbar />
       <ScrollToTop />
       <Routes>
-        <Route element={<ProtectedRoutes/>}>
+        <Route element={<ProtectedRoutes />}>
           <Route path="/" element={<Home />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/about" element={<AboutUsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/userprofile" element={<MyOrders />} />
         </Route>
-        <Route element={<AuthenticationRoutes/>}>
+        <Route element={<AuthenticationRoutes />}>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
         </Route>
-        <Route path="*" element={<PageNotFound />}/>
+        <Route path="/verifyEmail/:token" element={<VerifyEmail />} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
       <NewsLetter />
       <Footer />

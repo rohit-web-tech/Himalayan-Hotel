@@ -9,8 +9,8 @@ const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
-    userEmail: "",
-    userPassword: ""
+    email: "",
+    password: ""
   })
 
   const handleUserInput = (e) => {
@@ -19,16 +19,16 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (userData.userPassword != "" && userData.userEmail != "") {
+    if (userData.password != "" && userData.email != "") {
 
-      const res = await fetchData(`/loginUser`, setLoading, "POST", userData);
+      const res = await fetchData(`/user/loginUser`, setLoading, "POST", userData);
+      console.log(res)
       if (res?.success) {
-        localStorage.setItem("akhoteluser", JSON.stringify(res[0]))
         message.success('Logged in successfully!!');
         setUserData(({ userEmail: "", userPassword: "" }))
         navigate("/");
       } else {
-        message.error('Invalid Email or Password');
+        message.error(res?.message);
       }
     } else {
       message.warning('Please fill all the fields!!');
@@ -50,17 +50,17 @@ const Login = () => {
               <div className="space-y-6">
                 <InputBox
                   handleChange={handleUserInput}
-                  value={userData.userEmail}
+                  value={userData.email}
                   placeholder="Your Email"
                   type="email"
-                  name="userEmail"
+                  name="email"
                 />
                 <InputBox
                   handleChange={handleUserInput}
-                  value={userData.userPassword}
+                  value={userData.password}
                   placeholder="Your Email"
                   type="password"
-                  name="userPassword"
+                  name="password"
                 />
               </div>
 

@@ -32,7 +32,7 @@ const User = () => {
             message.warning("Please fill all the fields!!");
             return;
         }
-        const res = await fetchData("/registerUser", setFormSubmitLoading, "POST", user);
+        const res = await fetchData("/user/registerUser", setFormSubmitLoading, "POST", user);
         if (res?.success) {
             message.success("User registered successfully!!");
             setTimeout(() => {
