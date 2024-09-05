@@ -1,9 +1,10 @@
 import ApiError from "../lib/apiError.js";
 import asyncHandler from "../lib/asyncHandler.js";
 import { sendEmailVerificationMail } from "../lib/mailsender.js";
-import { generateAccessAndRefeshTokens, generateToken } from "../lib/token.js";
+import { decodeToken, generateAccessAndRefeshTokens, generateToken } from "../lib/token.js";
 import User from "../models/user.model.js";
-import options from "../lib/const.js";
+import { options } from "../lib/const.js";
+import ApiResponse from "../lib/apiResponse.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
 
@@ -126,7 +127,7 @@ export const loginUser = asyncHandler(async (req, res) => {
     const user = await User.findOne({
         email,
         $or: [{ isVerified: true }, { emailVerificationTokenExpiry: { $gt: Date.now() } }]
-    }).select("-password -emailVerificationTokenExpiry - emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
+    });
 
     if (!user) {
         throw new ApiError(400, "User doesn't exist with this email!!");
@@ -136,7 +137,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Email is not verified, please verify your email first to login!!");
     }
 
-    const isPasswordCorrect = await user.isPasswordCorrect();
+    const isPasswordCorrect = await user.isCorrectPassword(password);
 
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Please login with right credentials!!");
@@ -145,6 +146,8 @@ export const loginUser = asyncHandler(async (req, res) => {
     const [AccessToken, RefreshToken] = await generateAccessAndRefeshTokens(user);
 
     user.refreshToken = RefreshToken;
+
+    await user.save();
 
     res
         .status(200)
@@ -230,32 +233,32 @@ export const getAllAdmins = asyncHandler(async () => {
     ).select("-password -emailVerificationTokenExpiry - emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
 
     res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            admins,
-            "Success!!"
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                admins,
+                "Success!!"
+            )
         )
-    )
 
 });
 
-export const getCurrentUser = asyncHandler(async(req,res)=>{
+export const getCurrentUser = asyncHandler(async (req, res) => {
 
     res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            res?.user,
-            "User fetched successfully !!"
-        )
-    );
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                res?.user,
+                "User fetched successfully !!"
+            )
+        );
 
 });
 
-export const logout = asyncHandler(async(req,res)=>{
+export const logout = asyncHandler(async (req, res) => {
 
     await User.findByIdAndUpdate(
         {
@@ -268,47 +271,47 @@ export const logout = asyncHandler(async(req,res)=>{
         }
     )
 
-    res 
-    .status(200)
-    .json(
-        200,
-        {},
-        "You are logged out successfully !!"
-    )
-    .clearCookie("AccessToken",options)
-    .clearCookie("RefreshToken", options)
+    res
+        .status(200)
+        .json(
+            200,
+            {},
+            "You are logged out successfully !!"
+        )
+        .clearCookie("AccessToken", options)
+        .clearCookie("RefreshToken", options)
 
 })
 
-export const deleteUser = asyncHandler(async()=>{
+export const deleteUser = asyncHandler(async () => {
 
-    const {userId} = req.body ;
+    const { userId } = req.body;
 
-    if(!userId){
-        throw new ApiError(400,"UserId is required !!")
+    if (!userId) {
+        throw new ApiError(400, "UserId is required !!")
     }
 
     const user = await User.findByIdAndDelete(userId);
 
-    if(!user){
-        throw new ApiError(404,"User doesn't exist !!")
+    if (!user) {
+        throw new ApiError(404, "User doesn't exist !!")
     }
 
-    const allUsers = await User.find({isVerified:true});
+    const allUsers = await User.find({ isVerified: true });
 
     res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            allUsers,
-            "User deleted successfully !!"
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                allUsers,
+                "User deleted successfully !!"
+            )
         )
-    )
 
 })
 
-export const editUser = asyncHandler(async(req,res)=>{
+export const editUser = asyncHandler(async (req, res) => {
 
     const { name, email, password, contactNumber, userId } = req.body;
 
@@ -316,13 +319,13 @@ export const editUser = asyncHandler(async(req,res)=>{
         throw new ApiError(400, "All fields are required!!");
     }
 
-    if(!userId){
-        throw new ApiError(400,"UserId is required !!")
+    if (!userId) {
+        throw new ApiError(400, "UserId is required !!")
     }
 
     const emailCheck = await User.findOne({
         email,
-        _id :  { $ne : userId }
+        _id: { $ne: userId }
     });
 
     if (emailCheck) {
@@ -330,18 +333,18 @@ export const editUser = asyncHandler(async(req,res)=>{
     }
 
     await User.findByIdAndUpdate(
-        userId ,
+        userId,
         {
-            $set : {
-                name, 
-                email, 
-                password, 
+            $set: {
+                name,
+                email,
+                password,
                 contactNumber
             }
         }
     );
 
-    const allUsers = await User.find({isVerified:true});
+    const allUsers = await User.find({ isVerified: true });
 
     res
         .status(200)
@@ -352,5 +355,46 @@ export const editUser = asyncHandler(async(req,res)=>{
                 "User's details updated successfully !!"
             )
         )
-    
+
+})
+
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+
+    const refreshToken = req?.cookies?.RefreshToken || req?.headers?.authorization?.replace("Bearer ", "");
+
+    if (!refreshToken) {
+        throw new ApiError(401, "Refresh Token is required !!");
+    }
+
+    const userInfo = await decodeToken(refreshToken);
+
+    const user = await User.findOne({
+        _id: userInfo?._id,
+        refreshToken: refreshToken
+    });
+
+    if (!user) {
+        throw new ApiError(401, "Unauthorised token !!");
+    }
+
+    const [newAccessToken, newRefreshToken] = await generateAccessAndRefeshTokens();
+    user.refreshToken = newRefreshToken;
+
+    await user?.save();
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    accessToken: newAccessToken,
+                    refreshToken: refreshToken
+                },
+                "Access token refreshed successfully !!"
+            )
+        )
+        .cookie("AccessToken", newAccessToken)
+        .cookie("RefreshToken", newRefreshToken);
+
 })

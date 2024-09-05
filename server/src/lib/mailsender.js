@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
-import bookingModel from '../models/BookingModel.js';
-import roomModel from '../models/RoomModel.js';
+import Booking from '../models/booking.model.js';
+import Room from '../models/room.model.js';
 import "dotenv/config.js";
 
 const client = process.env.CLIENT_URI ;
@@ -24,7 +24,7 @@ function sendEmail(mailOptions) {
 }
 
 export async function sendPreAlertMail(date) {
-    const bookings = await bookingModel.find({ toDate: date });
+    const bookings = await Booking.find({ toDate: date });
     if (bookings.length > 0) {
         bookings.forEach(booking => {
             if (booking.status === "booked") {
@@ -61,11 +61,11 @@ export async function sendPreAlertMail(date) {
 }
 
 export async function sendCheckOutMail(date) {
-    const bookings = await bookingModel.find({ toDate: date });
+    const bookings = await Booking.find({ toDate: date });
     if (bookings.length > 0) {
         bookings.forEach(async (booking) => {
             if (booking.status === "booked") {
-                const room = await roomModel?.findOne({ room_id: booking.room_id });
+                const room = await Room?.findOne({ room_id: booking.room_id });
                 let roomBookings = room?.currentBookings;
                 room.currentBookings = roomBookings.filter(room => {
                     return room.bookingId != booking._id;
@@ -219,7 +219,7 @@ export async function sendEmailVerificationMail(name, email, token){
         html: `
         <div style="width:100%; display:flex; justify-content:center;">
             <div style="max-width:800px;text-align: justify; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-                <h1 style="text-align:center ; color:#088178">ROOM BOOKING CANCELLED !</h1>
+                <h1 style="text-align:center ; color:#088178">Welcome to The Himalayan Hotel !</h1>
                 <h3>Hi <span style="color:#088178">${name},</span></h3>
                 <p style="color:#414141;">
                     Verify your email to complete registeration process!<br><br>
@@ -231,4 +231,5 @@ export async function sendEmailVerificationMail(name, email, token){
         </div>
             `
     };
+    sendEmail(mailOptions);
 }

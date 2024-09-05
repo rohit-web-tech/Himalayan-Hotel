@@ -29,10 +29,12 @@ cron.schedule('* * * * *', () => {
 import homeRoute from  "./routes/home.route.js";
 import aboutRoute from  "./routes/about.route.js";
 import contactRoute from  "./routes/contact.route.js";
+import userRoute from  "./routes/user.route.js";
 
 app.use("/api/home",homeRoute);
 app.use("/api/about",aboutRoute);
 app.use("/api/contact",contactRoute);
+app.use("/api/user",userRoute);
 
 
 export default app ;
