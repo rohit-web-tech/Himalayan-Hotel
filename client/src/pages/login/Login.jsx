@@ -58,7 +58,7 @@ const Login = () => {
                 <InputBox
                   handleChange={handleUserInput}
                   value={userData.userPassword}
-                  placeholder="Your Password"
+                  placeholder="Your Password3"
                   type="password"
                   name="userPassword"
                 />
