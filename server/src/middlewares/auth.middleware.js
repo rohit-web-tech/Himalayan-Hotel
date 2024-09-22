@@ -4,7 +4,8 @@ import {decodeToken} from "../lib/token.js";
 import User from "../models/user.model.js";
 
 const auth = asyncHandler(async(req,_,next)=>{
-    const accessToken = req?.cookies?.AccessToken || req?.headers?.authorization?.replace("Bearer ","");
+
+    const accessToken = req?.cookies?.AccessToken || req?.headers?.authorization?.replace("Bearer ","") ;
 
     if(!accessToken) {
         throw new ApiError(401,"Unauthorized request !!");

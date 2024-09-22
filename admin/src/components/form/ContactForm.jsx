@@ -39,9 +39,9 @@ const Contact = () => {
         }
 
         const res = await fetchData("/contact", setFormSubmitLoading, "POST", data);
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("Contact details edited successfully!!");
-            setData(res?.contact || {
+            setData(res?.data || {
                 contact: "",
                 email: "",
                 address: "",

@@ -143,23 +143,23 @@ export const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Please login with right credentials!!");
     }
 
-    const [AccessToken, RefreshToken] = await generateAccessAndRefeshTokens(user);
+    const [accessToken, refreshToken] = await generateAccessAndRefeshTokens(user);
 
-    user.refreshToken = RefreshToken;
+    user.refreshToken = refreshToken;
 
     await user.save();
 
     res
         .status(200)
+        .cookie("AccessToken", accessToken, options)
+        .cookie("RefreshToken", refreshToken, options)
         .json(
             new ApiResponse(
                 200,
-                { user, AccessToken, RefreshToken },
+                { user, accessToken, refreshToken },
                 "You are logged in successfully!!"
             )
         )
-        .cookie("AccessToken", AccessToken, options)
-        .cookie("RefreshToken", RefreshToken, options)
 
 })
 
@@ -174,13 +174,13 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     const admin = await User.findOne({
         email,
         isAdmin: true
-    }).select("-password -emailVerificationTokenExpiry - emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
+    }).select("-emailVerificationTokenExpiry -emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
 
     if (!admin) {
         throw new ApiError(400, "Please login with right credentials!!");
     }
 
-    const isPasswordCorrect = await admin.isPasswordCorrect();
+    const isPasswordCorrect = await admin.isCorrectPassword(password);
 
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Please login with right credentials!!");
@@ -192,6 +192,8 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
     res
         .status(200)
+        .cookie("AccessToken", AccessToken, options)
+        .cookie("RefreshToken", RefreshToken, options)
         .json(
             new ApiResponse(
                 200,
@@ -199,18 +201,16 @@ export const loginAdmin = asyncHandler(async (req, res) => {
                 "You are logged in successfully!!"
             )
         )
-        .cookie("AccessToken", AccessToken, options)
-        .cookie("RefreshToken", RefreshToken, options)
 
 })
 
-export const getAllUsers = asyncHandler(async () => {
+export const getAllUsers = asyncHandler(async (_, res) => {
 
     const users = await User.find(
         {
             isVerified: true
         }
-    ).select("-password -emailVerificationTokenExpiry - emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
+    ).select("-emailVerificationTokenExpiry -emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
 
     res
         .status(200)
@@ -224,13 +224,13 @@ export const getAllUsers = asyncHandler(async () => {
 
 });
 
-export const getAllAdmins = asyncHandler(async () => {
+export const getAllAdmins = asyncHandler(async (_, res) => {
 
     const admins = await User.find(
         {
             isAdmin: true
         }
-    ).select("-password -emailVerificationTokenExpiry - emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
+    ).select("-emailVerificationTokenExpiry -emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
 
     res
         .status(200)
@@ -251,7 +251,7 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                res?.user,
+                req?.user,
                 "User fetched successfully !!"
             )
         );
@@ -273,17 +273,19 @@ export const logout = asyncHandler(async (req, res) => {
 
     res
         .status(200)
-        .json(
-            200,
-            {},
-            "You are logged out successfully !!"
-        )
         .clearCookie("AccessToken", options)
         .clearCookie("RefreshToken", options)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "You are logged out successfully !!"
+            )
+        )
 
 })
 
-export const deleteUser = asyncHandler(async () => {
+export const deleteUser = asyncHandler(async (req, res) => {
 
     const { userId } = req.body;
 
@@ -325,7 +327,8 @@ export const editUser = asyncHandler(async (req, res) => {
 
     const emailCheck = await User.findOne({
         email,
-        _id: { $ne: userId }
+        _id: { $ne: userId },
+        $or: [{ isVerified: true }, { emailVerificationTokenExpiry: { $gt: Date.now() } }]
     });
 
     if (emailCheck) {

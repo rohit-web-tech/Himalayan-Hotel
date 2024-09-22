@@ -40,10 +40,10 @@ const Home = () => {
             return;
         }
 
-        const res = await fetchData("/Home", setFormSubmitLoading ,"POST", data);
+        const res = await fetchData("/home", setFormSubmitLoading ,"POST", data);
         if (res?.success) {
             message.success("Home details edited successfully!!");
-            setData(res?.home || {
+            setData(res?.data || {
                 title: "",
                 subtitle: "",
                 imageUrl: ""

@@ -16,10 +16,9 @@ const Admin = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getUsers = async () => {
-        const res = await fetchGetData("/allAdmins", setLoading);
+        const res = await fetchGetData("/user/allAdmins", setLoading);
         if (res?.success) {
-            console.log(res)
-            setUsers(res?.admins || []);
+            setUsers(res?.data || []);
         }
     }
 
@@ -28,11 +27,11 @@ const Admin = () => {
     }, [])
 
     const addNewUser = async (user) => {
-        if (!user?.userName || !user?.userEmail || !user?.userNumber || !user?.userPassword) {
+        if (!user?.name || !user?.email || !user?.contactNumber || !user?.password) {
             message.warning("Please fill all the fields!!");
             return;
         }
-        const res = await fetchData("/registerAdmin", setFormSubmitLoading, "POST", user);
+        const res = await fetchData("/user/registerAdmin", setFormSubmitLoading, "POST", user);
         if (res?.success) {
             message.success("User registered successfully!!");
             setTimeout(() => {
@@ -45,11 +44,11 @@ const Admin = () => {
     }
 
     const editUser = async (user) => {
-        if (!user?.userName || !user?.userEmail || !user?.userNumber || !user?.userPassword) {
+        if (!user?.name || !user?.email || !user?.contactNumber || !user?.password) {
             message.warning("Please fill all the fields!!");
             return;
         }
-        const res = await fetchData("/editUser", setFormSubmitLoading, "PATCH", user);
+        const res = await fetchData("/user/editUser", setFormSubmitLoading, "PATCH", { userId: user?._id, ...user });
         if (res?.success) {
             message.success("User details edited successfully!!");
             setTimeout(() => {
@@ -61,12 +60,12 @@ const Admin = () => {
         }
     }
 
-    const deleteUser = async(user) => {
+    const deleteUser = async (user) => {
         const userConfirmation = confirm(`Are you sure, you want to delete ${user?.userName || "Admin"} ?`);
 
         if (!userConfirmation) return;
 
-        const res = await fetchData("/deleteUser", setFormSubmitLoading , "DELETE", user);
+        const res = await fetchData("/user/deleteUser", setFormSubmitLoading, "DELETE", { userId: user?._id });
         if (res?.success) {
             message.success("User details deleted successfully!!");
             getUsers();
@@ -95,9 +94,9 @@ const Admin = () => {
         return users?.map((user, i) => (
             <TR key={user.id}>
                 <TD>{i + 1}</TD>
-                <TD>{user?.userName || "Guest"}</TD>
-                <TD>{user?.userEmail || "guest@example.com"}</TD>
-                <TD>{user?.userContact || user?.userNumber || "00000-999999"}</TD>
+                <TD>{user?.name || "Guest"}</TD>
+                <TD>{user?.email || "guest@example.com"}</TD>
+                <TD>{user?.contactNumber || user?.userNumber || "00000-999999"}</TD>
                 <TD><button
                     className='bg-blue-600 py-1 px-6 text-white rounded-lg text-xs'
                     onClick={() => {
@@ -122,35 +121,40 @@ const Admin = () => {
                 loading ? (
                     <Loader styles='w-10 h-10 my-[calc(50vh-40px)]' />
                 ) :
-                    users?.length < 1 ? (
-                        <div className='h-screen flex justify-center items-center'>
-                            <NoData
-                                title='No Admin found !!'
+                    !showForm ? (
+                        <>
+                            <Header
+                                title="Admins"
+                                handleBtn={() => {
+                                    setShowForm(true);
+                                }}
+                                btnText="Add new admin"
                             />
-                        </div>
+                            {
+                                users?.length < 1 ? (
+                                    <div className='h-screen flex justify-center items-center'>
+                                        <NoData
+                                            title='No Admin found !!'
+                                        />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <Table tableFields={tableFeilds} tableRows={rowData} />
+                                    </>
+                                )
+                            }
+                        </>
                     ) : (
-                        !showForm ? (
-                            <>
-                                <Header
-                                    title="Admins"
-                                    handleBtn={() => {
-                                        setShowForm(true);
-                                    }}
-                                    btnText="Add new admin"
-                                />
-                                <Table tableFields={tableFeilds} tableRows={rowData} />
-                            </>
-                        ) : (
-                            <UserForm
-                                title="Create New Admin"
-                                edit={editForm}
-                                initialUserData={editUserData}
-                                goBackHandler={closeForm}
-                                submitHandler={editForm ? editUser : addNewUser}
-                                loading={formSubmitLoading}
-                            />
-                        )
+                        <UserForm
+                            title="Create New Admin"
+                            edit={editForm}
+                            initialUserData={editUserData}
+                            goBackHandler={closeForm}
+                            submitHandler={editForm ? editUser : addNewUser}
+                            loading={formSubmitLoading}
+                        />
                     )
+
             }
 
         </div>

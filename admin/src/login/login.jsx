@@ -4,24 +4,26 @@ import { message } from "antd"
 import "./style.scss";
 import { fetchData } from '../lib/fetchData';
 import Loader from '../components/loader';
+import { useDispatch } from 'react-redux';
+import { login } from '../store/slice/user';
 
 const Login = () => {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [adminDetails, setAdminDetails] = useState({
-    userName: "",
+    email: "",
     password: ""
   });
   const loginAdmin = async (e) => {
     e.preventDefault();
-    if (adminDetails.userName != "" && adminDetails.password != "") {
-      const res = await fetchData("/adminLogin", setLoading, "POST", adminDetails);
+    if (adminDetails?.email != "" && adminDetails?.password != "") {
+      const res = await fetchData("/user/adminLogin", setLoading, "POST", adminDetails);
       if (res?.success) {
-        localStorage.setItem("akhoteladmin", JSON.stringify(res))
+        dispatch(login(res?.data));
         navigate("/");
       } else {
-        message.error(res.message);
+        message.error(res?.message || "Something went wrong please try again after some time!!");
       }
     } else {
       message.warning("All Feilds are required!!");
@@ -44,11 +46,11 @@ const Login = () => {
               <div className="space-y-6">
                 <input
                   onChange={handleUserInput}
-                  value={adminDetails.userName}
+                  value={adminDetails.email}
                   className="w-full bg-transparent text-gray-600 rounded-md border border-gray-400 px-3 py-2 text-xs placeholder-gray-600 invalid:border-red-500"
                   placeholder="Your Email"
                   type="email"
-                  name="userName"
+                  name="email"
                   id="email" />
                 <input
                   onChange={handleUserInput}

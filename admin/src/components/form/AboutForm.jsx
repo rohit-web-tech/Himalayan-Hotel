@@ -37,9 +37,9 @@ const About = () => {
         }
 
         const res = await fetchData("/about", setFormSubmitLoading, "POST", data);
-        if (res.message == "success") {
+        if (res?.success) {
             message.success("About details edited successfully!!");
-            setData(res?.about || {
+            setData(res?.data || {
                 title: "",
                 description: "",
                 imageUrl: ""

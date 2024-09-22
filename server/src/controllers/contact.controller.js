@@ -15,7 +15,7 @@ export const setContact = asyncHandler(async (req, res) => {
     const {contact, email , address,imageUrl} = req.body;
     await Contact.deleteMany({});
     const contactDetails = new Contact({contact, email , address,imageUrl});
-    await contact.save();
+    await contactDetails.save();
     res
     .status(201)
     .json(

@@ -4,8 +4,12 @@ import { message } from 'antd';
 import Loader from '../../components/loader';
 import { fetchData } from '../../lib/fetchData';
 import InputBox from '../../components/InputBox';
+import {useDispatch} from "react-redux"
+import {login} from "../../store/slice/user.slice.js"
+
+
 const Login = () => {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
+  const dispatch = useDispatch() ;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
@@ -26,6 +30,7 @@ const Login = () => {
       if (res?.success) {
         message.success('Logged in successfully!!');
         setUserData(({ userEmail: "", userPassword: "" }))
+        dispatch(login(res?.data?.user))
         navigate("/");
       } else {
         message.error(res?.message);
@@ -58,7 +63,7 @@ const Login = () => {
                 <InputBox
                   handleChange={handleUserInput}
                   value={userData.password}
-                  placeholder="Your Email"
+                  placeholder="Your Password"
                   type="password"
                   name="password"
                 />

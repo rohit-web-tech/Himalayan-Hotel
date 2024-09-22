@@ -29,8 +29,8 @@ router.route("/adminLogin").post(loginAdmin);
 router.route("/editUser").patch(auth,adminAuth,editUser);
 router.route("/deleteUser").delete(auth,adminAuth,deleteUser);
 router.route("/registerAdmin").post(auth,adminAuth,registerAdmin);
-router.route("/currentUser").post(auth,getCurrentUser);
-router.route("/logout").post(auth,logout);
+router.route("/currentUser").get(auth,getCurrentUser);
+router.route("/logout").get(auth,logout);
 router.route("/refreshToken").post(refreshAccessToken);
 
 router.post("/enquiry", async (req, res) => {

@@ -1,5 +1,6 @@
 export const options = {
     httpOnly: true,
     secure: false,
-    sameSite : 'Lax'
+    sameSite : 'Lax',
+    domain : "localhost"
 }

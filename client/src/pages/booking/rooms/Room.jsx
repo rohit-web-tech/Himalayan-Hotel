@@ -6,13 +6,14 @@ import { RiStarSFill } from "react-icons/ri";
 import RoomDetails from '../../roomdetails/RoomDetails';
 import BookRoom from '../../bookRoom/BookRoom';
 import { fetchData } from '../../../lib/fetchData';
+import { useNavigate } from 'react-router-dom';
 
 
 const Room = (props) => {
     const [bookingLoading, setBookingLoading] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
     const [showBookRoom, setShowBookRoom] = useState(false);
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
+    const navigate = useNavigate();
     const handleBook = (roomId) => {
         const fromDate = props.dates.fromDate, toDate = props.dates.toDate;
         if (fromDate == "" && toDate == "") {
@@ -23,13 +24,11 @@ const Room = (props) => {
         }
     }
     const handleBookRoom = async (roomId) => {
-        const loggedInUser = JSON.parse(localStorage.getItem("akhoteluser"));
         const fromDate = props.dates.fromDate, toDate = props.dates.toDate;
-        setBookingLoading(true)
-        const res = await fetchData(`/bookRoom`, setBookingLoading, "POST", { fromDate, toDate, userId: loggedInUser._id, roomId })
+        const res = await fetchData(`/booking`, setBookingLoading, "POST", { fromDate, toDate, roomId })
         if (res?.success) {
             message.success("Room Booked Successfully!!");
-            setShowBookRoom(false);
+            navigate("/userprofile");
         } else {
             message.error(res.message)
         }
@@ -37,7 +36,7 @@ const Room = (props) => {
     return (
         <div id="room-container">
             <div className="room-image">
-                <Img src={props?.room?.imageUrls} />
+                <Img src={props?.room?.imageUrl} />
             </div>
             <div className="room-description">
                 <div className="room-name">
@@ -52,10 +51,10 @@ const Room = (props) => {
                 </div>
                 <div className="room-price-and-maxcount">
                     <div className="room-price">
-                        <p>Rent : {props?.room.roomRent}rs/Night</p>
+                        <p>Rent : {props?.room?.rent}rs/Night</p>
                     </div>
                     <div className="max-count">
-                        <p>Maximum Member : {props?.room.maxCount}</p>
+                        <p>Available Rooms : {props?.room?.totalRooms}</p>
                     </div>
                 </div>
             </div>

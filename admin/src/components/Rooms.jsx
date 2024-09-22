@@ -16,8 +16,10 @@ const Rooms = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getrooms = async () => {
-        const res = await fetchGetData("/getRooms", setLoading);
-        setRooms(res || []);
+        const res = await fetchGetData("/room", setLoading);
+        if (res?.success) {
+            setRooms(res.data || []);
+        }
     }
 
     useEffect(() => {
@@ -25,12 +27,12 @@ const Rooms = () => {
     }, [])
 
     const addNewRoom = async (room) => {
-        if (!room?.roomName || !room?.roomRent || !room?.maxCount || !room?.room_id || !room?.imageUrls) {
+        if (!room?.roomName || !room?.rent || !room?.totalRooms || !room?.imageUrl) {
             message.warning("Please fill all the fields!!");
             return;
         }
 
-        const res = await fetchData("/setRoomData", setFormSubmitLoading, "POST", room);
+        const res = await fetchData("/room", setFormSubmitLoading, "POST", room);
         if (res?.success) {
             message.success("Room added successfully!!");
             setTimeout(() => {
@@ -44,12 +46,12 @@ const Rooms = () => {
     }
 
     const editRoom = async (room) => {
-        if (!room?.roomName || !room?.roomRent || !room?.maxCount || !room?.room_id || !room?.imageUrls) {
+        if (!room?.roomName || !room?.rent || !room?.totalRooms || !room?.imageUrl) {
             message.warning("Please fill all the fields!!");
             return;
         }
 
-        const res = await fetchData("/editRoom", setFormSubmitLoading, "PATCH", room);
+        const res = await fetchData("/room", setFormSubmitLoading, "PATCH", { roomId: room?._id, ...room });
         if (res?.success) {
             message.success("Room details edited successfully!!");
             setTimeout(() => {
@@ -61,12 +63,12 @@ const Rooms = () => {
         }
     }
 
-    const deleteRoom = async(room) => {
+    const deleteRoom = async (room) => {
         const userConfirmation = confirm(`Are you sure, you want to delete ${room?.roomName || "Room"} ?`);
 
         if (!userConfirmation) return;
 
-        const res = await fetchData("/deleteRoom", setFormSubmitLoading, "DELETE", room);
+        const res = await fetchData("/room", setFormSubmitLoading, "DELETE", { roomId: room?._id, ...room });
         if (res?.success) {
             message.success("Room details deleted successfully!!");
             getrooms();
@@ -85,9 +87,8 @@ const Rooms = () => {
     const tableFeilds = [
         "#",
         "Name",
-        "Number",
-        "Max Member",
         "Rent",
+        "Total Rooms",
         "Edit",
         "Delete"
     ]
@@ -97,9 +98,8 @@ const Rooms = () => {
             <TR key={rooms.id}>
                 <TD>{i + 1}</TD>
                 <TD>{room?.roomName || "Room"}</TD>
-                <TD>{room?.room_id || "1"}</TD>
-                <TD>{room?.maxCount || "1"}</TD>
-                <TD>{room?.roomRent || "00"}</TD>
+                <TD>{room?.rent || "00"}</TD>
+                <TD>{room?.totalRooms || "1"}</TD>
                 <TD><button
                     className='bg-blue-600 py-1 px-6 text-white rounded-lg text-xs'
                     onClick={() => {
@@ -124,34 +124,41 @@ const Rooms = () => {
                 loading ? (
                     <Loader styles="h-10 w-10 my-[calc(50vh-40px)]" />
                 ) :
-                    rooms?.length < 1 ? (
-                        <div className='h-screen flex justify-center items-center'>
-                            <NoData
-                                title='No Room Data found !!'
+                    !showForm ? (
+                        <>
+                            <Header
+                                title="Rooms"
+                                handleBtn={() => {
+                                    setShowForm(true);
+                                }}
+                                btnText="Add new room"
                             />
-                        </div>
+                            {
+                                rooms?.length < 1 ? (
+                                    <>
+                                        <div className='h-[calc(100vh-100px)] flex justify-center items-center'>
+                                            <NoData
+                                                title='No Room Data found !!'
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Table tableFields={tableFeilds} tableRows={rowData} />
+                                    </>
+                                )
+                            }
+                        </>
+
                     ) : (
-                        !showForm ? (
-                            <>
-                                <Header
-                                    title="Rooms"
-                                    handleBtn={() => {
-                                        setShowForm(true);
-                                    }}
-                                    btnText="Add new room"
-                                />
-                                <Table tableFields={tableFeilds} tableRows={rowData} />
-                            </>
-                        ) : (
-                            <RoomForm
-                                title="Add new room"
-                                edit={editForm}
-                                initialUserData={editRoomData}
-                                goBackHandler={closeForm}
-                                submitHandler={editForm ? editRoom : addNewRoom}
-                                loading={formSubmitLoading}
-                            />
-                        )
+                        <RoomForm
+                            title="Add new room"
+                            edit={editForm}
+                            initialUserData={editRoomData}
+                            goBackHandler={closeForm}
+                            submitHandler={editForm ? editRoom : addNewRoom}
+                            loading={formSubmitLoading}
+                        />
                     )
             }
 

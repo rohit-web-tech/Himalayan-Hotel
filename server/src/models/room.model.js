@@ -9,13 +9,8 @@ const roomSchema = mongoose.Schema({
         type : Number ,
         require : true 
     },
-    imageUrls : [{
+    imageUrl : {
         type : String ,
-        require : true 
-    }],
-    availableRooms : {
-        type : Number ,
-        default : 0 ,
         require : true 
     },
     totalRooms : {
