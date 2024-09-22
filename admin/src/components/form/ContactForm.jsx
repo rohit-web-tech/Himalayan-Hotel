@@ -17,9 +17,9 @@ const Contact = () => {
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
 
     const getData = async () => {
-        const res = await fetchGetData("/getContact", setLoading);
-        if (res.message == "success") {
-            setData(res?.contact || {
+        const res = await fetchGetData("/contact", setLoading);
+        if (res?.success) {
+            setData(res?.data || {
                 contact: "",
                 email: "",
                 address: "",
@@ -38,10 +38,10 @@ const Contact = () => {
             return;
         }
 
-        const res = await fetchData("/setContact", setFormSubmitLoading, "POST", data);
-        if (res.message == "success") {
+        const res = await fetchData("/contact", setFormSubmitLoading, "POST", data);
+        if (res?.success) {
             message.success("Contact details edited successfully!!");
-            setData(res?.contact || {
+            setData(res?.data || {
                 contact: "",
                 email: "",
                 address: "",

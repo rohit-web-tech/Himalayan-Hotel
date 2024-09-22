@@ -27,9 +27,9 @@ const Navbar = () => {
   })
 
   const getData = async () => {
-    const res = await fetchGetData(`/getContact`)
-    if (res.message == "success") {
-      setData(res?.contact || {
+    const res = await fetchGetData(`/contact`)
+    if (res?.success) {
+      setData(res?.data || {
         contact: "",
         email: "",
         address: "",

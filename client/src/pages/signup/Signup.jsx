@@ -6,14 +6,13 @@ import { fetchData } from '../../lib/fetchData';
 import InputBox from '../../components/InputBox';
 
 const Signup = () => {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
-    userName: "",
-    userNumber: "",
-    userEmail: "",
-    userPassword: ""
+    name: "",
+    email: "",
+    password: "",
+    contactNumber: ""
   })
 
   const handleUserInput = (e) => {
@@ -23,16 +22,14 @@ const Signup = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     //checking for blank input
-    if (userData.userName != "" && userData.userPassword != "" && userData.userEmail != "" && userData.userNumber != "") {
+    if (userData.name != "" && userData.password != "" && userData.email != "" && userData.contactNumber != "") {
       //checking for a valid mobile number
-      if (userData.userNumber.length === 10) {
-        const res = await fetchData(`/registerUser`, setLoading, "POST", userData)
+      if (userData.contactNumber.length === 10) {
+        const res = await fetchData(`/user/registerUser`, setLoading, "POST", userData)
 
-        if (res.message == "success") {
-          localStorage.setItem("akhoteluser", JSON.stringify(res?._doc))
-          message.success("Sign Up Successfully!!");
+        if (res?.success) {
+          message.success(res.message);
           setUserData(({ userName: "", userNumber: "", userEmail: "", userPassword: "" }))
-          navigate("/");
         } else {
           message.error(res.message);
         }
@@ -60,31 +57,31 @@ const Signup = () => {
               <div className="space-y-6">
                 <InputBox
                   handleChange={handleUserInput}
-                  value={userData.userName}
+                  value={userData.name}
                   placeholder="Your Name"
                   type="text"
-                  name="userName"
+                  name="name"
                 />
                 <InputBox
                   handleChange={handleUserInput}
-                  value={userData.userEmail}
+                  value={userData.email}
                   placeholder="Your Email"
                   type="email"
-                  name="userEmail"
+                  name="email"
                 />
                 <InputBox
                   handleChange={handleUserInput}
-                  value={userData.userNumber}
+                  value={userData.contactNumber}
                   placeholder="Your Contact Number"
                   type="number"
-                  name="userNumber"
+                  name="contactNumber"
                 />
                 <InputBox
                   handleChange={handleUserInput}
-                  value={userData.userPassword}
+                  value={userData.password}
                   placeholder="Your Password"
                   type="password"
-                  name="userPassword"
+                  name="password"
                 />
               </div>
 

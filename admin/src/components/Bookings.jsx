@@ -9,8 +9,14 @@ const Bookings = () => {
     const [loading, setLoading] = useState(true);
 
     const getBookings = async () => {
-        const res = await fetchGetData(`/allBookings`,setLoading)
-        setBookings(res?.bookings)
+        try {
+            const res = await fetchGetData(`/booking/all`,setLoading)
+            if(res?.success){
+                setBookings(res?.data)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     useEffect(() => {
@@ -21,7 +27,6 @@ const Bookings = () => {
         "#",
         "Room",
         "RoomName",
-        "RoomNumber",
         "Rent",
         "From",
         "To",
@@ -35,15 +40,14 @@ const Bookings = () => {
         return bookings?.map((booking, i) => (
             <TR key={booking.id}>
                 <TD>{i + 1}</TD>
-                <TD><img src={booking?.imageUrl || ""} alt="" className='h-6 w-14' /></TD>
-                <TD>{booking?.roomName || "1"}</TD>
-                <TD>{booking?.room_id || "1"}</TD>
+                <TD><img src={booking?.room?.imageUrl || ""} alt="" className='h-6 w-14' /></TD>
+                <TD>{booking?.room?.roomName || "1"}</TD>
                 <TD>{booking?.totalAmount || "00"}</TD>
                 <TD>{booking?.fromDate || "00"}</TD>
                 <TD>{booking?.toDate || "00"}</TD>
                 <TD>{booking?.totalDays || "00"}</TD>
-                <TD>{booking?.userName || "00"}</TD>
-                <TD>{booking?.userEmail || "00"}</TD>
+                <TD>{booking?.user?.name || "Guest"}</TD>
+                <TD>{booking?.user?.email || "guest@guest.com"}</TD>
                 <TD>{booking?.status == "booked" ? (
                     <span className="bg-green-500 text-white p-2 rounded-md text-xs">Booked</span>
                 ) : booking?.status == "cancelled" ? (

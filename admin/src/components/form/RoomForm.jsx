@@ -6,11 +6,10 @@ import Loader from '../loader'
 
 const RoomForm = ({ loading=false , title, initialUserData = "", edit = false, submitHandler = () => { }, goBackHandler = () => { } }) => {
     const [room, setRoom] = useState(initialUserData || {
-        room_id: "",
         roomName: "",
-        roomRent: "",
-        maxCount: "",
-        imageUrls : ""
+        rent: "",
+        imageUrl: "",
+        totalRooms : ""
     })
 
     const handleUserInput = (e) => {
@@ -27,14 +26,6 @@ const RoomForm = ({ loading=false , title, initialUserData = "", edit = false, s
             }}>
                 <InputBox
                     handleUserInput={handleUserInput}
-                    name="room_id"
-                    type="number"
-                    placeholder="Enter Room Number"
-                    value={room?.room_id}
-                    label="Room No."
-                />
-                <InputBox
-                    handleUserInput={handleUserInput}
                     name="roomName"
                     type="text"
                     placeholder="Enter Room Name"
@@ -43,30 +34,30 @@ const RoomForm = ({ loading=false , title, initialUserData = "", edit = false, s
                 />
                 <InputBox
                     handleUserInput={handleUserInput}
-                    name="roomRent"
+                    name="rent"
                     type="number"
                     placeholder="Enter Room Rent"
-                    value={room?.roomRent}
+                    value={room?.rent}
                     label="Room Rent"
                 />
                 <InputBox
                     handleUserInput={handleUserInput}
-                    name="maxCount"
+                    name="totalRooms"
                     type="number"
-                    placeholder="Enter Maximum Members"
-                    value={room?.maxCount}
-                    label="Max Members"
+                    placeholder="Enter Total Rooms"
+                    value={room?.totalRooms}
+                    label="Number of Rooms"
                 />
                 <InputBox
                     handleUserInput={handleUserInput}
-                    name="imageUrls"
+                    name="imageUrl"
                     type="text"
                     placeholder="Enter Image Url"
-                    value={room?.imageUrls}
+                    value={room?.imageUrl}
                     label="Image"
                 />
                 <ImagePreview
-                    src={room?.imageUrls}
+                    src={room?.imageUrl}
                 />
                 <Submit value={loading ? (<Loader styles="h-4 w-4" />) : edit ? "Save Changes" : "Add Room"} />
             </form>

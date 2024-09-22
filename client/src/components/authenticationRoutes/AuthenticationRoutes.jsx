@@ -1,9 +1,9 @@
 import React from 'react'
 import { Navigate , Outlet} from 'react-router-dom';
+import {useSelector} from "react-redux" ;
 
 const AuthenticationRoutes = () => {
-  const loggedInUser = JSON.parse(localStorage.getItem("akhoteluser"));
-  const auth = loggedInUser ? true : false ;
+  const auth = useSelector((state)=>state?.user?.isLoggedIn) ? true : false ;
   return auth ? <Navigate to="/" /> : <Outlet/>
 }
 

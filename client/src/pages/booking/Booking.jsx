@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useDebugValue, useEffect, useState } from 'react'
 import './style.scss';
 import DateSelector from '../../components/DateSelector/DateSelector';
 import Room from './rooms/Room';
@@ -6,11 +6,10 @@ import ContentWrapper from '../../components/contentWrapper/ContentWrapper';
 import moment from 'moment';
 import NoData from '../../components/NoData';
 import { useNavigate } from 'react-router-dom';
-import { fetchGetData } from '../../lib/fetchData';
+import { fetchData, fetchGetData } from '../../lib/fetchData';
 const Booking = () => {
   const [rooms, setRooms] = useState([]);
   const [roomSearch, setRoomSearch] = useState("");
-  const [duplicateRooms, setDuplicateRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [Dates, setDates] = useState({
     "fromDate": "",
@@ -19,62 +18,44 @@ const Booking = () => {
 
   const navigate = useNavigate();
 
-  const handleFilterByDate = (dates) => {
+  const handleFilterByDate = async (dates) => {
+
     setDates({
       "fromDate": !dates ? "" : moment(dates[0]?.format("DD-MMM-YYYY"))._i,
       "toDate": !dates ? "" : moment(dates[1]?.format("DD-MMM-YYYY"))._i
     })
 
-    let fromDate = moment(dates[0]?.format("DD-MMM-YYYY"))._i;
-    let toDate = moment(dates[1]?.format("DD-MMM-YYYY"))._i;
+    const res = await fetchData("/room/filterByDate", setLoading, "POST", {fromDate : Dates?.fromDate , toDate : Dates?.toDate});
+    if (res?.success) {
+      setRooms(res?.data || []);
+    }
 
-    setTimeout(() => {
-      if (Dates.fromDate !== "" && Dates.toDate !== "") {
-        let tempRooms = [];
-        for (const room of duplicateRooms) {
-          let availability = false;
-          if (room?.currentBookings?.length > 0) {
-            for (const booking of room?.currentBookings) {
-              if (
-                !moment(fromDate).isBetween(booking?.fromDate, booking?.toDate) &&
-                !moment(toDate).isBetween(booking?.fromDate, booking?.toDate) &&
-                !moment(booking?.fromDate).isBetween(fromDate, toDate) &&
-                !moment(booking?.toDate).isBetween(fromDate, toDate)
-              ) {
-                if (
-                  fromDate !== booking?.fromDate &&
-                  fromDate !== booking?.toDate &&
-                  toDate !== booking?.fromDate &&
-                  toDate !== booking?.toDate
-                ) {
-                  availability = true;
-                } else {
-                  availability = false;
-                }
-              } else {
-                availability = false;
-              }
-            }
-          }
-          if (availability || room?.currentBookings?.length == 0) {
-            tempRooms.push(room);
-          }
-          setRooms(tempRooms);
-        }
-      } else {
-        setRooms(duplicateRooms);
-      }
-    }, 100)
   }
 
 
   useEffect(() => {
     (async () => {
-      const res = await fetchGetData(`/getRooms`, setLoading);
-      setRooms(res);
-      setDuplicateRooms(res);
+      const res = await fetchGetData(`/room`, setLoading);
+      if (res?.success) {
+        console.log(res?.data)
+        setRooms(res?.data);
+      }
     })()
-  }, [])
+  }, []);
+
+  let filterBySearch = async () => {
+    const res = await fetchData("/room/filterByQuery",setLoading,"POST",{query:roomSearch,...Dates});
+    if(res?.success){
+      setRooms(res?.data||[])
+    }
+  }
+
+  useEffect(() => {
+    const getData = setTimeout(() => {
+      filterBySearch();
+    }, 600)
+    return () => clearTimeout(getData);
+  }, [roomSearch]);
 
   let handleRoomSearch = (e) => {
     setRoomSearch(() => e.target.value);
@@ -126,18 +107,9 @@ const Booking = () => {
                   btnHandler={() => navigate("/")}
                 />
               ) : (
-                rooms.length >= 1 && rooms?.filter(item => item?.roomName?.toLowerCase().includes(roomSearch?.toLowerCase()))
-                  .length < 1 ? (
-                  <NoData
-                    title={`No room found for ${roomSearch}`}
-                    btnHandler={() => setRoomSearch("")}
-                    btnText="Show All Rooms"
-                  />
-                ) :
-                  rooms?.filter(item => item?.roomName?.toLowerCase()?.includes(roomSearch.toLowerCase()))
-                    .map(room => (
-                      <Room dates={Dates} room={room} key={room.room_id} roomId={room.room_id} />
-                    ))
+                rooms?.map(room => (
+                  <Room dates={Dates} room={room} key={room._id} roomId={room._id} />
+                ))
               )
           }
         </div>

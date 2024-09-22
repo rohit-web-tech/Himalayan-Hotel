@@ -35,7 +35,7 @@ const RoomDetails = ({ setShowDetails , roomDetails , handleBook , roomId}) => {
               <div class="grid w-full grid-cols-1 items-center gap-x-6 gap-y-8 sm:grid-cols-12 lg:gap-x-8">
                 <div class="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5">
                   <img
-                    src={roomDetails?.imageUrls}
+                    src={roomDetails?.imageUrl}
                     alt={roomDetails?.roomName}
                     class="object-cover object-center w-full"
                   />
@@ -56,8 +56,8 @@ const RoomDetails = ({ setShowDetails , roomDetails , handleBook , roomId}) => {
                         </div>
                     </div>
                   <section aria-labelledby="information-heading" class="mt-2">
-                    <p class="text-[16px] text-gray-900">{roomDetails?.roomRent}rs/Night</p>
-                    <p class="text-[16px] text-gray-900">Maxium Member : {roomDetails?.maxCount}</p>
+                    <p class="text-[16px] text-gray-900">{roomDetails?.rent}rs/Night</p>
+                    <p class="text-[16px] text-gray-900">Available Rooms : {roomDetails?.totalRooms}</p>
                   </section>
 
                   <section aria-labelledby="options-heading" class="mt-10">

@@ -5,10 +5,10 @@ import Loader from '../loader'
 
 const UserForm = ({loading=false, title, initialUserData = "", edit = false, submitHandler = () => { } , goBackHandler = () => {}}) => {
     const [user, setUser] = useState(initialUserData || {
-        userName: "",
-        userEmail: "",
-        userNumber: "",
-        userPassword: ""
+        name: "",
+        email: "",
+        contactNumber: "",
+        password: ""
     })
 
     const handleUserInput = (e) => {
@@ -25,34 +25,34 @@ const UserForm = ({loading=false, title, initialUserData = "", edit = false, sub
             }}>
                 <InputBox
                     handleUserInput={handleUserInput}
-                    name="userName"
+                    name="name"
                     type="text"
                     placeholder="Enter Name"
-                    value={user?.userName}
+                    value={user?.name}
                     label="Name"
                     />
                 <InputBox
                     handleUserInput={handleUserInput}
-                    name="userEmail"
+                    name="email"
                     type="email"
                     placeholder="Enter Email"
-                    value={user?.userEmail}
+                    value={user?.email}
                     label="Email"
                     />
                 <InputBox
                     handleUserInput={handleUserInput}
-                    name="userNumber"
+                    name="contactNumber"
                     type="number"
                     placeholder="Enter Number"
-                    value={user?.userNumber}
+                    value={user?.contactNumber}
                     label="Contact Number"
                     />
                 <InputBox
                     handleUserInput={handleUserInput}
-                    name="userPassword"
+                    name="password"
                     type="password"
                     placeholder="Enter Password"
-                    value={user?.userPassword}
+                    value={user?.password}
                     label="Password"
                     />
                 <Submit value={loading ? (<Loader styles="h-4 w-4" />) : (edit ? "Save Changes" : "Register")} />

@@ -4,13 +4,17 @@ import { message } from 'antd';
 import Loader from '../../components/loader';
 import { fetchData } from '../../lib/fetchData';
 import InputBox from '../../components/InputBox';
+import {useDispatch} from "react-redux"
+import {login} from "../../store/slice/user.slice.js"
+
+
 const Login = () => {
-  const BASE_URL = import.meta.env.VITE_BASE_URL;
+  const dispatch = useDispatch() ;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
-    userEmail: "",
-    userPassword: ""
+    email: "",
+    password: ""
   })
 
   const handleUserInput = (e) => {
@@ -19,16 +23,17 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (userData.userPassword != "" && userData.userEmail != "") {
+    if (userData.password != "" && userData.email != "") {
 
-      const res = await fetchData(`/loginUser`, setLoading, "POST", userData);
-      if (res.message == "success") {
-        localStorage.setItem("akhoteluser", JSON.stringify(res[0]))
+      const res = await fetchData(`/user/loginUser`, setLoading, "POST", userData);
+      console.log(res)
+      if (res?.success) {
         message.success('Logged in successfully!!');
         setUserData(({ userEmail: "", userPassword: "" }))
+        dispatch(login(res?.data?.user))
         navigate("/");
       } else {
-        message.error('Invalid Email or Password');
+        message.error(res?.message);
       }
     } else {
       message.warning('Please fill all the fields!!');
@@ -50,17 +55,17 @@ const Login = () => {
               <div className="space-y-6">
                 <InputBox
                   handleChange={handleUserInput}
-                  value={userData.userEmail}
+                  value={userData.email}
                   placeholder="Your Email"
                   type="email"
-                  name="userEmail"
+                  name="email"
                 />
                 <InputBox
                   handleChange={handleUserInput}
-                  value={userData.userPassword}
-                  placeholder="Your Password3"
+                  value={userData.password}
+                  placeholder="Your Password"
                   type="password"
-                  name="userPassword"
+                  name="password"
                 />
               </div>
 

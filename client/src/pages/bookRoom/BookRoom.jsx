@@ -1,5 +1,4 @@
 import React from "react";
-import image from "../../assets/herobanner.jpg";
 import { RiStarSFill } from "react-icons/ri";
 import moment from 'moment';
 import Loader from "../../components/loader";
@@ -40,7 +39,7 @@ const BookRoom = ({ setShowBookRoom , roomDetails , dates , handleBookRoom ,room
               <div class="grid w-full grid-cols-1 items-start gap-x-6 gap-y-8 sm:grid-cols-12 lg:gap-x-8">
                 <div class="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5">
                   <img
-                    src={roomDetails?.imageUrls}
+                    src={roomDetails?.imageUrl}
                     alt={roomDetails?.roomName}
                     class="object-cover object-center"
                   />
@@ -61,14 +60,13 @@ const BookRoom = ({ setShowBookRoom , roomDetails , dates , handleBookRoom ,room
                         </div>
                     </div>
                   <section aria-labelledby="information-heading" class="mt-2 gap-1 flex flex-col mb-1">
-                    <p class="text-[16px] text-gray-900">{roomDetails?.roomRent}rs/Night</p>
-                    <p class="text-[16px] text-gray-900">Maxium Member : {roomDetails?.maxCount}</p>
+                    <p class="text-[16px] text-gray-900">{roomDetails?.rent}rs/Night</p>
                     <p class="text-[16px] text-gray-900">From : {fromDate}</p>
                     <p class="text-[16px] text-gray-900">To : {toDate}</p>
                   </section>
 
                   <h2 className="text-left font-semibold text-[16px] text-black mb-1">Total Days : {totalDays}</h2>
-                  <h2 className="text-left font-semibold text-[16px] text-black">Total Rent : {totalDays*roomDetails?.roomRent}rs</h2>
+                  <h2 className="text-left font-semibold text-[16px] text-black">Total Rent : {totalDays*roomDetails?.rent}rs</h2>
 
                   <section aria-labelledby="options-heading" class="mt-10">
                     <button

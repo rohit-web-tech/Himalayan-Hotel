@@ -3,8 +3,13 @@ import NavBtn from './NavBtn.jsx'
 import { useNavigate } from "react-router-dom"
 import { IoMdClose } from "react-icons/io";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { logout } from '../../store/slice/user.js';
+import { useDispatch } from 'react-redux';
+import { fetchGetData } from '../../lib/fetchData.js';
+import { message } from 'antd';
 
 const Navbar = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showNav, setShowNav] = useState(false);
 
@@ -72,10 +77,15 @@ const Navbar = () => {
                     </li>
                 </ul>
                 <div className='bg-red-600 py-1 hover:bg-red-800 hover:cursor-pointer w-44 text-sm rounded-md text-center'
-                    onClick={() => {
-                        if(!confirm("Are you sure, you want to logout ?")) return ;
-                        localStorage.removeItem('akhoteladmin');
-                        navigate("/login");
+                    onClick={async () => {
+                        if (!confirm("Are you sure, you want to logout ?")) return;
+                        const res = await fetchGetData("/user/logout");
+                        if (res?.success) {
+                            message.success("You have logged out successfully !!")
+                            dispatch(logout());
+                        } else {
+                            message.error(res?.message)
+                        }
                     }}
                 >
                     Logout
