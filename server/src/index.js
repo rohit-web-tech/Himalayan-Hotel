@@ -14,6 +14,12 @@ connectDb()
             console.error(`😪 Server listening error :`, err?.message);
         })
 
+        app.get("/hello",(req,res)=>{
+            res.json(
+                new api
+            )
+        })
+
         app.get("/", (_, res) => {
             res.json(
                 new ApiResponse(
