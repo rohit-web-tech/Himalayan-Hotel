@@ -16,9 +16,9 @@ export default function Location({data}) {
                     <h6>Get In Touch</h6>
                     <h1>Visit our hotel or contact us today</h1>
                     <p className='flex items-center gap-1'><FaLocationDot /> {data?.address || "Palampur, Himachal Pradesh, India"}</p>
-                    <p className='flex items-center gap-1'><MdEmail />{data?.email || "contact@himalayanhotel.com"}</p>
+                    <p className='flex items-center gap-1'><MdEmail /> {data?.email || "contact@himalayanhotel.com"}</p>
                     <p className='flex items-center gap-1'><FaPhoneAlt /> +91-{data?.contact || "99999-00000"}</p>
-                    <p className='flex items-center gap-1'><IoTime/>Monday To Saturday, 10:00AM-6:00PM</p>
+                    <p className='flex items-center gap-1'><IoTime/> 24 X 7 Open</p>
                 </div>
                 <div className="image flex-box justify-center align-center bg-gray-600">
                 <Img src={data?.imageUrl || image}/>
