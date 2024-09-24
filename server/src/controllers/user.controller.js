@@ -190,6 +190,8 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
     admin.refreshToken = RefreshToken;
 
+    console.log(options)
+
     res
         .status(200)
         .cookie("AccessToken", AccessToken, options)
