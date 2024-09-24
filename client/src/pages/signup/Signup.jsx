@@ -28,7 +28,7 @@ const Signup = () => {
         const res = await fetchData(`/user/registerUser`, setLoading, "POST", userData)
 
         if (res?.success) {
-          message.success(res.message);
+          message.success("A mail has sent to your email for verification. Please verify your email to complete registeration process !!");
           setUserData(({ userName: "", userNumber: "", userEmail: "", userPassword: "" }))
         } else {
           message.error(res.message);
