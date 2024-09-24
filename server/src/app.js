@@ -9,7 +9,7 @@ const app = express() ;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin : true,
+    origin : ["https://himalayanhotel.netlify.app","https://adminhimalayanhotel.netlify.app"],
     credentials: true
 }));
 app.use(cookieParser());
