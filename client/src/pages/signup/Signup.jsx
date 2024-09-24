@@ -21,9 +21,7 @@ const Signup = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    //checking for blank input
     if (userData.name != "" && userData.password != "" && userData.email != "" && userData.contactNumber != "") {
-      //checking for a valid mobile number
       if (userData.contactNumber.length === 10) {
         const res = await fetchData(`/user/registerUser`, setLoading, "POST", userData)
 
