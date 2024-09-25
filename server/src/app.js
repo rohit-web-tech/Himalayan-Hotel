@@ -12,7 +12,9 @@ app.use(cors({
     origin : ["https://himalayanhotel.netlify.app","https://adminhimalayanhotel.netlify.app"],
     credentials: true
 }));
-app.use(cookieParser());
+app.use(cookieParser(
+    process.env.JWT_SECRET
+));
 
 // node-cron 
 cron.schedule('* * * * *', () => {
