@@ -1,6 +1,5 @@
 export const options = {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
-    sameSite : 'None' ,
-    domain : process.env.DOMAIN
+    signed : true 
 }
