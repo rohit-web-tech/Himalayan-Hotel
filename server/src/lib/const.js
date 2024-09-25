@@ -1,5 +1,5 @@
 export const options = {
-    httpOnly: false,
+    httpOnly: true,
     secure: true,
     signed : true 
 }
