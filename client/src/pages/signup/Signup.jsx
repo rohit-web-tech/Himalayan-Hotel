@@ -4,6 +4,7 @@ import { message } from 'antd';
 import Loader from '../../components/loader';
 import { fetchData } from '../../lib/fetchData';
 import InputBox from '../../components/InputBox';
+import Modal from '../../components/modal/Modal';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -14,6 +15,34 @@ const Signup = () => {
     password: "",
     contactNumber: ""
   })
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    title: "",
+    desc: "",
+    cancelText: "",
+    confirmText: ""
+  });
+
+  const closeModal = () => {
+    setShowModal(false);
+  }
+
+  const handleConfirm = () => {
+    navigate("/");
+    closeModal();
+  }
+
+  const openModal = () => {
+    setModalData(() => (
+      {
+        title: "Verify Your Email !!",
+        desc: "We have sent you an email for verification. Please verify your email by clicking on the link given through mail to complete verification process.",
+        confirmText: "Ok",
+        cancelText: ""
+      }
+    ));
+    setShowModal(true);
+  }
 
   const handleUserInput = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
@@ -26,7 +55,7 @@ const Signup = () => {
         const res = await fetchData(`/user/registerUser`, setLoading, "POST", userData)
 
         if (res?.success) {
-          message.success("A mail has sent to your email for verification. Please verify your email to complete registeration process !!");
+          openModal();
           setUserData(({ userName: "", userNumber: "", userEmail: "", userPassword: "" }))
         } else {
           message.error(res.message);
@@ -43,6 +72,15 @@ const Signup = () => {
 
   return (
     <div className="flex min-h-[600px] items-center justify-center bg-white p-12">
+      <Modal
+        show={showModal}
+        confirmText={modalData?.confirmText}
+        onConfirm={handleConfirm}
+        loading={false}
+        title={modalData?.title}
+        desc={modalData?.desc}
+        type="alert"
+      />
       <form action="">
         <div className="max-w-lg rounded-xl bg-gradient-to-b from-sky-300 to-purple-500 p-px">
           <div className="rounded-[calc(1.5rem-1px)] bg-gray-100 px-10 p-12 shadow-sm shadow-black">

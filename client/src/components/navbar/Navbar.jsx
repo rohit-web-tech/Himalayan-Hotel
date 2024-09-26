@@ -3,7 +3,8 @@ import logo from "../../assets/logo.png";
 import Img from "../lazyloading/Img";
 import ContentWrapper from "../contentWrapper/ContentWrapper";
 import { FaLocationDot, FaXTwitter } from "react-icons/fa6";
-import { IoMdLogIn, IoMdClose } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
+import { FaUserCircle } from "react-icons/fa";
 import {
   FaPhoneAlt,
   FaLinkedinIn,
@@ -15,6 +16,7 @@ import { MdEmail } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import NavBtn from "./NavBtn";
 import { fetchGetData } from "../../lib/fetchData";
+import { useSelector } from 'react-redux';
 
 const Navbar = () => {
   const [showSideNav, setShowSideNav] = useState(false);
@@ -25,9 +27,12 @@ const Navbar = () => {
     address: "",
     imageUrl: ""
   })
+  const isLoggedIn = useSelector(
+    state => state.user.isLoggedIn
+  );
 
   const getData = async () => {
-    const res = await fetchGetData(`/contact`)
+    const res = await fetchGetData(`/contact`);
     if (res?.success) {
       setData(res?.data || {
         contact: "",
@@ -91,31 +96,49 @@ const Navbar = () => {
               <Img src={logo} className="h-10" />
             </div>
             <ul className="hidden items-center gap-6 text-sm text-[--secondary-color] cursor-pointer sm:flex">
-              <LI value="Home" endpoint="/" />
-              <LI value="Book Room" endpoint="/booking" />
-              <LI value="About Us" endpoint="/about" />
-              <LI value="Contact Us" endpoint="/contact" />
-            </ul>
-            <div className="flex items-center gap-3">
-              <IoMdLogIn onClick={() => { navigate("/userprofile") }} className="text-[--secondary-color] text-[32px] sm:block hidden" />
               {
-                showSideNav ? (
-                  <IoMdClose
-                    onClick={() => {
-                      setShowSideNav(false);
-                    }}
-                    className="sm:hidden block text-[--secondary-color] text-[32px]"
-                  />
+                isLoggedIn ? (
+                  <>
+                    <LI value="Home" endpoint="/" />
+                    <LI value="Book Room" endpoint="/booking" />
+                    <LI value="About Us" endpoint="/about" />
+                    <LI value="Contact Us" endpoint="/contact" />
+                  </>
                 ) : (
-                  <FaBars
-                    onClick={() => {
-                      setShowSideNav(true);
-                    }}
-                    className="sm:hidden block text-[--secondary-color] text-[32px]"
-                  />
+                  <>
+                    <LI value="Login" endpoint="/login" />
+                    <LI value="Sign Up" endpoint="/signup" />
+                  </>
                 )
               }
-            </div>
+            </ul>
+            {
+              (isLoggedIn || showSideNav)&& (
+                <div className="flex items-center gap-3">
+                  {
+                    isLoggedIn && <FaUserCircle onClick={() => { navigate("/userprofile") }} className="cursor-pointer hover:text-slate-400 text-[--secondary-color] text-[32px] sm:block hidden" />
+                  }
+                  {
+                    showSideNav ? (
+                      <IoMdClose
+                        onClick={() => {
+                          setShowSideNav(false);
+                        }}
+                        className="sm:hidden block text-[--secondary-color] text-[32px]"
+                      />
+                    ) : (
+                      <FaBars
+                        onClick={() => {
+                          setShowSideNav(true);
+                        }}
+                        className="sm:hidden block text-[--secondary-color] text-[32px]"
+                      />
+                    )
+                  }
+                </div>
+              )
+            }
+
           </div>
           {
             showSideNav && (

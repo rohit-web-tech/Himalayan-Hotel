@@ -19,6 +19,7 @@ import { fetchGetData } from "./lib/fetchData";
 import { useDispatch } from "react-redux";
 import { login, logout } from "./store/slice/user.slice";
 import Loader from "./components/loader";
+import Modal from "./components/modal/Modal.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -42,7 +43,7 @@ function App() {
     <BrowserRouter>
       {
         loading ? (
-          <Loader 
+          <Loader
             styles="my-[45vh] h-10 w-10"
           />
         ) : (
@@ -50,8 +51,8 @@ function App() {
             <Navbar />
             <ScrollToTop />
             <Routes>
+              <Route path="/" element={<Home />} />
               <Route element={<ProtectedRoutes />}>
-                <Route path="/" element={<Home/>} />
                 <Route path="/booking" element={<Booking />} />
                 <Route path="/about" element={<AboutUsPage />} />
                 <Route path="/contact" element={<ContactPage />} />

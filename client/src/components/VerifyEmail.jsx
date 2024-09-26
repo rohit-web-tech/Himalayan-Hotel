@@ -18,7 +18,7 @@ const VerifyEmail = () => {
         if(res?.success){
             message.success("Email verified successfully !!") ;
             setTimeout(()=>{
-                navigate("/");
+                navigate("/login");
             },500)
         }else{
             message.error(res?.message);

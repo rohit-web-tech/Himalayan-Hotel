@@ -3,7 +3,8 @@ import HeroBanner from "./heroBanner/HeroBanner";
 import About from "../About/AboutUsContent/AboutUsContent";
 import image from "../../assets/about.jpg";
 import Loader from "../../components/loader";
-import {fetchGetData} from "../../lib/fetchData.js";
+import { fetchGetData } from "../../lib/fetchData.js";
+import Modal from "../../components/modal/Modal.jsx";
 
 const Home = () => {
   const [loading, setLoading] = useState(true)
