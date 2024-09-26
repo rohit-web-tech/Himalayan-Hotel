@@ -1,6 +1,8 @@
+import "dotenv/config";
+
 export const options = {
     httpOnly: true,
     secure: true,
-    sameSite : 'lax',
+    sameSite : 'None',
     domain : process.env.DOMAIN
 }
