@@ -3,6 +3,7 @@ import "dotenv/config";
 export const options = {
     httpOnly: true,
     secure: true,
-    sameSite : 'None',
-    domain : process.env.DOMAIN
+    sameSite : 'Lax',
+    domain : '.netlify.app', 
+    path : "/"
 }
