@@ -151,7 +151,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     console.log(options)
 
-    res
+    return res
         .status(200)
         .cookie("AccessToken", accessToken, options)
         .cookie("RefreshToken", refreshToken, options)
