@@ -149,6 +149,8 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     await user.save();
 
+    console.log(options)
+
     res
         .status(200)
         .cookie("AccessToken", accessToken, options)
