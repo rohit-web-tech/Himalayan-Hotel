@@ -145,7 +145,7 @@ export const filterRoomsByDates = asyncHandler(async (req, res) => {
 
     const filteredRooms = rooms.map(async (room) => {
         const roomAvailility = await getRoomAvailibility(room?._id, fromDate, toDate);
-        room.availableRooms = roomAvailility;
+        room.totalRooms = roomAvailility;
         return roomAvailility > 0 ? room : null;
     });
 
@@ -176,7 +176,7 @@ export const filterRoomsBySearch = asyncHandler(async (req, res) => {
     if (fromDate && toDate) {
         const filteredRooms = rooms.filter(async (room) => {
             const roomAvailility = await getRoomAvailibility(room?._id, fromDate, toDate);
-            room.availableRooms = roomAvailility;
+            room.totalRooms = roomAvailility;
             return roomAvailility > 0;
         });
 
@@ -186,8 +186,6 @@ export const filterRoomsBySearch = asyncHandler(async (req, res) => {
                 const searchedRooms = filteredRooms.filter(room => (
                     room?.roomName?.toLowerCase()?.includes(query.toLowerCase())
                 ));
-
-                console.log(`search rooms from date : ${searchedRooms} and query is : ${query}`)
 
                 res
                     .status(200)
@@ -205,8 +203,6 @@ export const filterRoomsBySearch = asyncHandler(async (req, res) => {
         const searchedRooms = rooms.filter(room => (
             room?.roomName?.toLowerCase()?.includes(query.toLowerCase())
         ));
-
-        console.log(`search rooms without date : ${searchedRooms} and query is : ${query}`)
 
         res
             .status(200)
