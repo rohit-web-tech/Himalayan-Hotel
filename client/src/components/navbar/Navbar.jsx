@@ -113,32 +113,25 @@ const Navbar = () => {
               }
             </ul>
             {
-              (isLoggedIn || showSideNav) && (
-                <div className="flex items-center gap-3">
-                  {
-                    isLoggedIn && <FaUserCircle onClick={() => { navigate("/userprofile") }} className="cursor-pointer hover:text-slate-400 text-[--secondary-color] text-[32px] sm:block hidden" />
-                  }
-                  {
-                    showSideNav ? (
-                      <IoMdClose
-                        onClick={() => {
-                          setShowSideNav(false);
-                        }}
-                        className="sm:hidden block text-[--secondary-color] text-[32px]"
-                      />
-                    ) : (
-                      <FaBars
-                        onClick={() => {
-                          setShowSideNav(true);
-                        }}
-                        className="sm:hidden block text-[--secondary-color] text-[32px]"
-                      />
-                    )
-                  }
-                </div>
+              isLoggedIn && <FaUserCircle onClick={() => { navigate("/userprofile") }} className="cursor-pointer hover:text-slate-400 text-[--secondary-color] text-[32px] sm:block hidden" />
+            }
+            {
+              showSideNav ? (
+                <IoMdClose
+                  onClick={() => {
+                    setShowSideNav(false);
+                  }}
+                  className="sm:hidden block text-[--secondary-color] text-[32px]"
+                />
+              ) : (
+                <FaBars
+                  onClick={() => {
+                    setShowSideNav(true);
+                  }}
+                  className="sm:hidden block text-[--secondary-color] text-[32px]"
+                />
               )
             }
-
           </div>
           {
             showSideNav && (
