@@ -113,7 +113,7 @@ const Navbar = () => {
               }
             </ul>
             {
-              (isLoggedIn || showSideNav)&& (
+              (isLoggedIn || showSideNav) && (
                 <div className="flex items-center gap-3">
                   {
                     isLoggedIn && <FaUserCircle onClick={() => { navigate("/userprofile") }} className="cursor-pointer hover:text-slate-400 text-[--secondary-color] text-[32px] sm:block hidden" />
@@ -143,11 +143,23 @@ const Navbar = () => {
           {
             showSideNav && (
               <ul className="fixed left-0 flex-col z-80 bg-[--primary-color] flex w-full flex-wrap mt-2 border-[--secondary-color] border-t items-center justify-between gap-4 text-sm text-[--secondary-color] cursor-pointer sm:hidden py-3">
-                <LI value="Home" endpoint="/" handleClick={() => setShowSideNav(false)} />
-                <LI value="Book Room" endpoint="/booking" handleClick={() => setShowSideNav(false)} />
-                <LI value="About Us" endpoint="/about" handleClick={() => setShowSideNav(false)} />
-                <LI value="Contact Us" endpoint="/contact" handleClick={() => setShowSideNav(false)} />
-                <LI value="My Bookings" endpoint="/userprofile" handleClick={() => setShowSideNav(false)} />
+
+                {
+                  isLoggedIn ? (
+                    <>
+                      <LI value="Home" endpoint="/" handleClick={() => setShowSideNav(false)} />
+                      <LI value="Book Room" endpoint="/booking" handleClick={() => setShowSideNav(false)} />
+                      <LI value="About Us" endpoint="/about" handleClick={() => setShowSideNav(false)} />
+                      <LI value="Contact Us" endpoint="/contact" handleClick={() => setShowSideNav(false)} />
+                      <LI value="My Bookings" endpoint="/userprofile" handleClick={() => setShowSideNav(false)} />
+                    </>
+                  ) : (
+                    <>
+                      <LI value="Login" endpoint="/login" handleClick={() => setShowSideNav(false)} />
+                      <LI value="Sign Up" endpoint="/signup" handleClick={() => setShowSideNav(false)} />
+                    </>
+                  )
+                }
               </ul>
             )
           }
