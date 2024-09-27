@@ -34,7 +34,9 @@ export const getRoomAvailibility = async (roomId, fromDate, toDate) => {
             moment(from).isBetween(bookingFrom, bookingTo) ||
             moment(to).isBetween(bookingFrom, bookingTo) ||
             moment(bookingFrom).isBetween(from, to) ||
-            moment(bookingTo).isBetween(from, to)
+            moment(bookingTo).isBetween(from, to) || 
+            moment(bookingTo) == moment(to) || 
+            moment(bookingFrom) == moment(from)
         ) {
             bookingCount++;
         }
