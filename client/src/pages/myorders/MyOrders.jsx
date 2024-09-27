@@ -60,12 +60,14 @@ const MyOrders = () => {
     }
 
     const cancelBooking = (booking) => {
+        console.log(booking)
         if (booking?.status == "booked") {
-            fetchData(`/booking/cancel`, modalLoading, "DELETE", { bookingId: booking?._id })
+            fetchData(`/booking/cancel`, setModalLoading, "DELETE", { bookingId: booking?._id })
                 .then(res => {
                     message.success("Booking cancelled successfully!!")
                     getData();
                 }).catch(err => console.log(err))
+                .finally(()=>closeModal());
         }
     }
 
@@ -77,7 +79,9 @@ const MyOrders = () => {
                 desc: `This action can't be undo . Are you sure you want to cancel your booking for ${booking?.room?.roomName}?`,
                 confirmText: "Confirm",
                 cancelText: "Back",
-                confirmHandler: () => cancelBooking(booking)
+                confirmHandler : () => { 
+                    cancelBooking(booking) 
+                }
             }
         ));
         setShowModal(true);

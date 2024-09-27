@@ -136,12 +136,20 @@ export const getRoomDetails = asyncHandler(async (req, res) => {
 export const filterRoomsByDates = asyncHandler(async (req, res) => {
 
     const { fromDate, toDate } = req.body;
+    const rooms = await Room.find({});
 
     if (!fromDate || !toDate) {
-        throw new ApiError(400, "Please select the date range!!");
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    rooms,
+                    "Rooms filtered by dates successfully !!"
+                )
+            )
     }
 
-    const rooms = await Room.find({});
 
     const filteredRooms = rooms.map(async (room) => {
         const roomAvailility = await getRoomAvailibility(room?._id, fromDate, toDate);
@@ -166,38 +174,31 @@ export const filterRoomsByDates = asyncHandler(async (req, res) => {
 export const filterRoomsBySearch = asyncHandler(async (req, res) => {
 
     const { query, fromDate, toDate } = req.body;
-
-    if (!query) {
-        throw new ApiError(400, "Search query is required !!");
-    }
-
     const rooms = await Room.find({});
 
     if (fromDate && toDate) {
-        const filteredRooms = rooms.filter(async (room) => {
+        const filteredRooms = rooms.map(async (room) => {
             const roomAvailility = await getRoomAvailibility(room?._id, fromDate, toDate);
             room.totalRooms = roomAvailility;
-            return roomAvailility > 0;
+            return roomAvailility > 0 ? room : null;
         });
 
-        Promise.all(filteredRooms)
-            .then(filteredRooms => {
+        let result = await Promise.all(filteredRooms);
+        result = result.filter(room => room !== null)
 
-                const searchedRooms = filteredRooms.filter(room => (
-                    room?.roomName?.toLowerCase()?.includes(query.toLowerCase())
-                ));
+        const searchedRooms = result.filter(room => (
+            room?.roomName?.toLowerCase()?.includes(query.toLowerCase())
+        ));
 
-                res
-                    .status(200)
-                    .json(
-                        new ApiResponse(
-                            200,
-                            searchedRooms,
-                            "Rooms filtered by query successfully !!"
-                        )
-                    )
-
-            })
+        res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    searchedRooms,
+                    "Rooms filtered by query successfully !!"
+                )
+            )
     } else {
 
         const searchedRooms = rooms.filter(room => (

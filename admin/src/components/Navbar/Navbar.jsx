@@ -7,11 +7,52 @@ import { logout } from '../../store/slice/user.js';
 import { useDispatch } from 'react-redux';
 import { fetchGetData } from '../../lib/fetchData.js';
 import { message } from 'antd';
+import Modal from "../modal/Modal.jsx";
 
 const Navbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [showNav, setShowNav] = useState(false);
+    const [modalLoading, setModalLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalData, setModalData] = useState({
+        title: "",
+        desc: "",
+        cancelText: "",
+        confirmText: "",
+    });
+
+    const closeModal = () => {
+        setShowModal(false);
+    }
+
+    const logoutUser = async () => {
+        try {
+            const res = await fetchGetData("/user/logout", setModalLoading);
+            if (res?.success) {
+                navigate("/login");
+            } else {
+                message.error(res?.message)
+            }
+        } catch (error) {
+            message.error(error.message)
+        } finally {
+            dispatch(logout())
+            closeModal();
+        }
+    }
+
+    const handleLogOut = () => {
+        setModalData(() => (
+            {
+                title: "Are you sure you want to log out?",
+                desc: "You will need to sign in again to access your account. ",
+                confirmText: "Logout",
+                cancelText: "Stay Login"
+            }
+        ));
+        setShowModal(true);
+    }
 
     const closeNav = () => {
         setShowNav(false);
@@ -24,6 +65,17 @@ const Navbar = () => {
                 onClick={() => setShowNav(true)}
             ><RxHamburgerMenu /></div>
             <div className={`z-50 w-[300px] fixed top-0 left-0 bg-gray-700 text-white h-full md:flex ${showNav ? "flex" : "hidden"} flex-col items-center justify-between py-6`}>
+                <Modal
+                    show={showModal}
+                    confirmText={modalData?.confirmText}
+                    cancelText={modalData?.cancelText}
+                    onConfirm={logoutUser}
+                    loading={modalLoading}
+                    title={modalData?.title}
+                    desc={modalData?.desc}
+                    type="confirm"
+                    onCancel={closeModal}
+                />
                 <div
                     className='text-2xl absolute right-3 top-3 md:hidden block'
                     onClick={closeNav}
@@ -77,16 +129,7 @@ const Navbar = () => {
                     </li>
                 </ul>
                 <div className='bg-red-600 py-1 hover:bg-red-800 hover:cursor-pointer w-44 text-sm rounded-md text-center'
-                    onClick={async () => {
-                        if (!confirm("Are you sure, you want to logout ?")) return;
-                        const res = await fetchGetData("/user/logout");
-                        if (res?.success) {
-                            message.success("You have logged out successfully !!")
-                            dispatch(logout());
-                        } else {
-                            message.error(res?.message)
-                        }
-                    }}
+                    onClick={handleLogOut}
                 >
                     Logout
                 </div>

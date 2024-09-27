@@ -6,6 +6,7 @@ import { message } from "antd";
 import Loader from "./loader.jsx"
 import NoData from "./NoData.jsx";
 import { fetchData, fetchGetData } from '../lib/fetchData.js';
+import Modal from './modal/Modal.jsx';
 
 const Admin = () => {
     const [users, setUsers] = useState([]);
@@ -14,6 +15,19 @@ const Admin = () => {
     const [editUserData, setEditUserData] = useState("");
     const [loading, setLoading] = useState(true);
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
+    const [modalLoading, setModalLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalData, setModalData] = useState({
+        title: "",
+        desc: "",
+        cancelText: "",
+        confirmText: "",
+        confirmHandler: ""
+    });
+
+    const closeModal = () => {
+        setShowModal(false);
+    }
 
     const getUsers = async () => {
         const res = await fetchGetData("/user/allAdmins", setLoading);
@@ -44,10 +58,6 @@ const Admin = () => {
     }
 
     const editUser = async (user) => {
-        if (!user?.name || !user?.email || !user?.contactNumber || !user?.password) {
-            message.warning("Please fill all the fields!!");
-            return;
-        }
         const res = await fetchData("/user/editUser", setFormSubmitLoading, "PATCH", { userId: user?._id, ...user });
         if (res?.success) {
             message.success("User details edited successfully!!");
@@ -58,20 +68,55 @@ const Admin = () => {
         } else {
             message.error(res.message);
         }
+        closeModal();
+    }
+
+    const handleEdit = (user) => {
+
+        if (!user?.name || !user?.email || !user?.contactNumber || !user?.password) {
+            message.warning("Please fill all the fields!!");
+            return;
+        }
+
+        setModalData(() => (
+            {
+                title: `Are you sure, you want to edit ${user?.name || "User"} 's details ?`,
+                desc: `This action will edit ${user?.name || "User"}'s details !!`,
+                confirmText: "Confirm",
+                cancelText: "Cancel",
+                confirmHandler: () => {
+                    editUser(user);
+                }
+            }
+        ));
+        setShowModal(true);
     }
 
     const deleteUser = async (user) => {
-        const userConfirmation = confirm(`Are you sure, you want to delete ${user?.userName || "Admin"} ?`);
-
-        if (!userConfirmation) return;
-
-        const res = await fetchData("/user/deleteUser", setFormSubmitLoading, "DELETE", { userId: user?._id });
+        const res = await fetchData("/user/deleteUser", setModalLoading, "DELETE", { userId: user?._id });
         if (res?.success) {
             message.success("User details deleted successfully!!");
             getUsers();
         } else {
             message.error(res.message);
         }
+        closeModal();
+    }
+
+    const handleDelete = (user) => {
+
+        setModalData(() => (
+            {
+                title: `Are you sure, you want to delete ${user?.name || "User"} ?`,
+                desc: `This action will permanently delete ${user?.name || "User"}'s profile and can't be undo!!`,
+                confirmText: "Delete",
+                cancelText: "Cancel",
+                confirmHandler: () => {
+                    deleteUser(user);
+                }
+            }
+        ));
+        setShowModal(true);
     }
 
     const closeForm = () => {
@@ -108,7 +153,7 @@ const Admin = () => {
                 <TD><button
                     className='bg-red-600 py-1 px-6 text-white rounded-lg text-xs'
                     onClick={() => {
-                        deleteUser(user);
+                        handleDelete(user);
                     }}
                 >Delete</button></TD>
             </TR>
@@ -117,6 +162,17 @@ const Admin = () => {
 
     return (
         <div className='flex flex-col w-full md:w-[calc(100%-300px)] sm:px-14 px-6 py-3'>
+            <Modal
+                show={showModal}
+                confirmText={modalData?.confirmText}
+                cancelText={modalData?.cancelText}
+                onConfirm={modalData?.confirmHandler}
+                loading={modalLoading}
+                title={modalData?.title}
+                desc={modalData?.desc}
+                type="confirm"
+                onCancel={closeModal}
+            />
             {
                 loading ? (
                     <Loader styles='w-10 h-10 my-[calc(50vh-40px)]' />
@@ -150,7 +206,7 @@ const Admin = () => {
                             edit={editForm}
                             initialUserData={editUserData}
                             goBackHandler={closeForm}
-                            submitHandler={editForm ? editUser : addNewUser}
+                            submitHandler={editForm ? handleEdit : addNewUser}
                             loading={formSubmitLoading}
                         />
                     )

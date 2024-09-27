@@ -5,6 +5,7 @@ import ImagePreview from './ImagePreview'
 import { message } from "antd";
 import Loader from '../loader';
 import { fetchData, fetchGetData } from '../../lib/fetchData';
+import Modal from '../modal/Modal';
 
 const Contact = () => {
     const [data, setData] = useState({
@@ -15,6 +16,19 @@ const Contact = () => {
     })
     const [loading, setLoading] = useState(true);
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
+    const [modalLoading, setModalLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalData, setModalData] = useState({
+        title: "",
+        desc: "",
+        cancelText: "",
+        confirmText: "",
+        confirmHandler: ""
+    });
+
+    const closeModal = () => {
+        setShowModal(false);
+    }
 
     const getData = async () => {
         const res = await fetchGetData("/contact", setLoading);
@@ -33,12 +47,8 @@ const Contact = () => {
     }, [])
 
     const addNewData = async () => {
-        if (!data?.contact || !data?.email || !data?.address || !data?.imageUrl) {
-            message.warning("Please fill all the fields!!");
-            return;
-        }
 
-        const res = await fetchData("/contact", setFormSubmitLoading, "POST", data);
+        const res = await fetchData("/contact", setModalLoading, "POST", data);
         if (res?.success) {
             message.success("Contact details edited successfully!!");
             setData(res?.data || {
@@ -50,6 +60,28 @@ const Contact = () => {
         } else {
             message.error(res.message);
         }
+        closeModal();
+
+    }
+
+
+    const handleEdit = () => {
+
+        if (!data?.contact || !data?.email || !data?.address || !data?.imageUrl) {
+            message.warning("Please fill all the fields!!");
+            return;
+        }
+
+        setModalData(() => (
+            {
+                title: `Are you sure, you want to edit contact's details ?`,
+                desc: `This action will edit contact's details !!`,
+                confirmText: "Confirm",
+                cancelText: "Cancel",
+                confirmHandler: addNewData
+            }
+        ));
+        setShowModal(true);
     }
 
     const handleUserInput = (e) => {
@@ -58,6 +90,17 @@ const Contact = () => {
 
     return (
         <div className='sm:px-14 px-6 mt-4 w-full md:w-[calc(100%-300px)]  mb-3 flex flex-col justify-center'>
+            <Modal
+                show={showModal}
+                confirmText={modalData?.confirmText}
+                cancelText={modalData?.cancelText}
+                onConfirm={modalData?.confirmHandler}
+                loading={modalLoading}
+                title={modalData?.title}
+                desc={modalData?.desc}
+                type="confirm"
+                onCancel={closeModal}
+            />
             {
                 loading ? (
                     <Loader styles="h-10 w-10 my-[calc(50vh-40px)]" />
@@ -66,7 +109,7 @@ const Contact = () => {
                         <h3 className='text-base text-gray-700 font-semibold mb-2 mt-3'>Contact</h3>
                         <form className='flex flex-col gap-3' onSubmit={(e) => {
                             e.preventDefault();
-                            addNewData();
+                            handleEdit();
                         }}>
                             <InputBox
                                 handleUserInput={handleUserInput}

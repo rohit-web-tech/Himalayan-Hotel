@@ -25,12 +25,21 @@ const Booking = () => {
       "toDate": !dates ? "" : moment(dates[1]?.format("DD-MMM-YYYY"))._i
     })
 
-    const res = await fetchData("/room/filterByDate", setLoading, "POST", {fromDate : Dates?.fromDate , toDate : Dates?.toDate});
-    if (res?.success) {
-      setRooms(res?.data || []);
-    }
-
   }
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+        const res = await fetchData("/room/filterByDate", setLoading, "POST", {
+          fromDate: Dates.fromDate,
+          toDate: Dates.toDate
+        });
+        if (res?.success) {
+          setRooms(res?.data || []);
+        }
+    };
+    
+    fetchRooms();
+  }, [Dates]);
 
 
   useEffect(() => {
@@ -43,16 +52,14 @@ const Booking = () => {
     })()
   }, []);
 
-  let filterBySearch = async () => {
-    const res = await fetchData("/room/filterByQuery",setLoading,"POST",{query:roomSearch,...Dates});
-    if(res?.success){
-      setRooms(res?.data||[])
-    }
-  }
-
   useEffect(() => {
     const getData = setTimeout(() => {
-      filterBySearch();
+      (async () => {
+        const res = await fetchData("/room/filterByQuery",setLoading,"POST",{query:roomSearch,...Dates});
+        if(res?.success){
+          setRooms(res?.data||[])
+        }
+      })();   
     }, 600)
     return () => clearTimeout(getData);
   }, [roomSearch]);

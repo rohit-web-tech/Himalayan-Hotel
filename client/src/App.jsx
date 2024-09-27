@@ -19,7 +19,6 @@ import { fetchGetData } from "./lib/fetchData";
 import { useDispatch } from "react-redux";
 import { login, logout } from "./store/slice/user.slice";
 import Loader from "./components/loader";
-import Modal from "./components/modal/Modal.jsx";
 
 function App() {
   const dispatch = useDispatch();
