@@ -46,7 +46,7 @@ export async function sendPreAlertMail(date) {
                                 there's anything we can do to assist you before you go, please don't hesitate to reach out.
                                 <br><br> Looking forward to making your check-out effortless!</p>
                             <h4>Regards from <a target="_blank" href=${client} style="color:#088178 ; text-decoration: none;">THE HIMALAYAN HOTEL.</a></h4>
-                            <a target="_blank" href="${client}/userProfile"><button style="border:none ; padding : 5px 10px ; margin-top : 20px ; color : white ; font-size:14px ; cursor: pointer ; background : #088178;">
+                            <a target="_blank" href="${client}/profile/bookings"><button style="border:none ; padding : 5px 10px ; margin-top : 20px ; color : white ; font-size:14px ; cursor: pointer ; background : #088178;">
                                 Click Here For More Information
                             </button></a> 
                         </div>
@@ -82,7 +82,7 @@ export async function sendCheckOutMail(date) {
                                 there's anything we can do to assist you before you go, please don't hesitate to reach out.
                                 <br><br>Thanks for stay with us ! Please Visit Again</p>
                             <h4>Regards from <a target="_blank" href=${client} style="color:#088178 ; text-decoration: none;">THE HIMALAYAN HOTEL.</a></h4>
-                            <a target="_blank" href="${client}/userProfile"><button style="border:none ; padding : 5px 10px ; margin-top : 20px ; color : white ; font-size:14px ; cursor: pointer ; background : #088178;">
+                            <a target="_blank" href="${client}/profile/bookings"><button style="border:none ; padding : 5px 10px ; margin-top : 20px ; color : white ; font-size:14px ; cursor: pointer ; background : #088178;">
                                 Click Here For More Information
                             </button></a> 
                         </div>
@@ -114,7 +114,7 @@ export async function roomBookingMail(roomName, user, fromDate, toDate) {
                     there's anything we can do to assist you, please don't hesitate to reach out us.
                     <br><br> Looking forward to make your check-in effortless!</p>
                 <h4>Welcome to <a href=${client} style="color:#088178;text-decoration:none" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://hotel.rohitweb.tech&amp;source=gmail&amp;ust=1704270815561000&amp;usg=AOvVaw0dFCqzeb-cjn09mBU-Nq9q">THE HIMALAYAN HOTEL.</a></h4>
-                <a href="${client}/userProfile" target="_blank" data-saferedirecturl="https://www.google.com/url?q=${client}/userProfile&amp;source=gmail&amp;ust=1704270815561000&amp;usg=AOvVaw3OmZvcapVcpCnTtDKUQPny"><button style="border:none;padding:5px 10px;margin-top:20px;color:white;font-size:14px;background:#088178">
+                <a href="${client}/profile/booking" target="_blank" data-saferedirecturl="https://www.google.com/url?q=${client}/profile/bookings&amp;source=gmail&amp;ust=1704270815561000&amp;usg=AOvVaw3OmZvcapVcpCnTtDKUQPny"><button style="border:none;padding:5px 10px;margin-top:20px;color:white;font-size:14px;background:#088178">
                     Click Here For More Information
                 </button></a><div class="yj6qo"></div><div class="adL"> 
             </div></div>
@@ -155,7 +155,7 @@ export async function bookingCancelMail(booking,user,roomName) {
                     Just wanted to give you a confirmation that <span style="font-weight: bolder; color :#088178;">your
                     booking for ${roomName} from ${booking?.fromDate} to ${booking?.toDate} has been cancelled as per your request.</span>
                 <h4>Best Regards from <a target="_blank" href=${client} style="color:#088178 ; text-decoration: none;">THE HIMALAYAN HOTEL.</a></h4>
-                <a target="_blank" href="${client}/userProfile"><button style="border:none ; padding : 5px 10px ; margin-top : 20px ; color : white ; font-size:14px ; cursor: pointer ; background : #088178;">
+                <a target="_blank" href="${client}/profile/bookings"><button style="border:none ; padding : 5px 10px ; margin-top : 20px ; color : white ; font-size:14px ; cursor: pointer ; background : #088178;">
                     Click Here For More Information
                 </button></a> 
             </div>

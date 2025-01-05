@@ -24,7 +24,7 @@ const Booking = () => {
       "fromDate": !dates ? "" : moment(dates[0]?.format("DD-MMM-YYYY"))._i,
       "toDate": !dates ? "" : moment(dates[1]?.format("DD-MMM-YYYY"))._i
     })
-
+    
   }
 
   useEffect(() => {

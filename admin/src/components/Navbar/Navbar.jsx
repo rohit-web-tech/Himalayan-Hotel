@@ -111,6 +111,12 @@ const Navbar = () => {
                     </li>
                     <li>
                         <NavBtn
+                            to="/inventory"
+                            handleClick={closeNav}
+                        >Inventory</NavBtn>
+                    </li>
+                    <li>
+                        <NavBtn
                             to="/home"
                             handleClick={closeNav}
                         >Home</NavBtn>

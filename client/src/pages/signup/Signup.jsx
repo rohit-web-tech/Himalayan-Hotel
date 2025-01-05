@@ -85,7 +85,7 @@ const Signup = () => {
         <div className="max-w-lg rounded-xl bg-gradient-to-b from-sky-300 to-purple-500 p-px">
           <div className="rounded-[calc(1.5rem-1px)] bg-gray-100 px-10 p-12 shadow-sm shadow-black">
             <div>
-              <h1 className="text-lg font-semibold text-gray-800">Create an Account</h1>
+              <h1 className="text-lg font-semibold text-gray-800">Create an Account on The Himalayan Hotel</h1>
               <p className="text-xs tracking-wide text-gray-600">Already have an account ? <Link to="/login" className="text-blue-600 transition duration-200 hover:underline">Login Now</Link></p>
             </div>
 

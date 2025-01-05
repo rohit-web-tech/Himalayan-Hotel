@@ -47,7 +47,7 @@ const Login = () => {
         <div className="max-w-lg rounded-xl bg-gradient-to-b from-sky-300 to-purple-500 p-px">
           <div className="rounded-[calc(1.5rem-1px)] bg-gray-100 px-10 p-12 shadow-sm shadow-black">
             <div>
-              <h1 className="text-lg font-semibold text-gray-800">Login to your account</h1>
+              <h1 className="text-lg font-semibold text-gray-800">Login to The Himalayan Hotel</h1>
               <p className="text-xs tracking-wide text-gray-600">Don't have an account ? <Link to="/signup" className="text-blue-600 transition duration-200 hover:underline">Sign Up</Link> for free!</p>
             </div>
 

@@ -107,7 +107,7 @@ export const deleteRoom = asyncHandler(async (req, res) => {
 
 export const getRoomDetails = asyncHandler(async (req, res) => {
 
-    const { id } = req.param;
+    const { id } = req?.params;
 
     if (!id) {
         throw new ApiError(400, "Room id is required !!");

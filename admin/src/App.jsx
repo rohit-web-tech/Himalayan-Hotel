@@ -17,6 +17,8 @@ import Loader from "./components/loader";
 import {login, logout} from "./store/slice/user.js" ;
 import { useEffect, useState } from "react";
 import { fetchGetData } from "./lib/fetchData.js";
+import Inventory from "./components/Inventory.jsx";
+import RoomInventory from "./components/RoomInventory.jsx";
  
 function App() {
 
@@ -50,6 +52,8 @@ function App() {
               <Route path="/admins" element={<Admin />} />
               <Route path="/bookings" element={<Bookings />} />
               <Route path="/rooms" element={<Rooms />} />
+              <Route path="/inventory" element={<Inventory />} />
+              <Route path="/rooms/:id" element={<RoomInventory />} />
               <Route path="/home" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />

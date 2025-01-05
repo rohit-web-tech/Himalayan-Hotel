@@ -149,8 +149,6 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     await user.save();
 
-    console.log(options)
-
     return res
         .status(200)
         .cookie("AccessToken", accessToken, options)
@@ -295,11 +293,17 @@ export const deleteUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "UserId is required !!")
     }
 
-    const user = await User.findByIdAndDelete(userId);
+    const user = await User.findOne({_id:userId});
 
     if (!user) {
         throw new ApiError(404, "User doesn't exist !!")
     }
+
+    if(user?.isPrimary && user?.isAdmin){
+        throw new ApiError(403, "You can't delete primary admin !!")
+    }
+
+    await User.deleteOne({_id:userId});
 
     const allUsers = await User.find({ isVerified: true });
 
@@ -361,7 +365,7 @@ export const editUser = asyncHandler(async (req, res) => {
             )
         )
 
-})
+});
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
 
@@ -389,6 +393,8 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 
     res
         .status(200)
+        .cookie("AccessToken", newAccessToken)
+        .cookie("RefreshToken", newRefreshToken)
         .json(
             new ApiResponse(
                 200,
@@ -398,8 +404,6 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
                 },
                 "Access token refreshed successfully !!"
             )
-        )
-        .cookie("AccessToken", newAccessToken)
-        .cookie("RefreshToken", newRefreshToken);
+        );
 
 })

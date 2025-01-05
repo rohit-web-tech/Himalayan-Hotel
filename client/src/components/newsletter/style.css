@@ -25,13 +25,18 @@
 .golden{
     color : goldenrod ;
 }
+.news-container #email-get {
+    display : flex ;
+    justify-content: center ;
+    align-items: center;
+}
 .news-container #email-get .email-input{
     width : 300px ;
     height :  40px ;
     padding-left : 10px ; 
     border : none ;
     outline: none;
-    z-index : 50 ;
+    z-index : 10 ;
     color :  var(--primary-color) ;
     font-size: 14px ;
 }
@@ -40,9 +45,11 @@
     width : 80px;
     font-weight: 600;
     border : none ;
+    outline : none ;
     background-color: var(--main-theme);
     color : white ;
     font-size: 14px ;
+    z-index : 10 ;
 }
 .news-text{
     gap : 10px ;

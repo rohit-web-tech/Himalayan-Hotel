@@ -28,24 +28,31 @@ export const getRoomAvailibility = async (roomId, fromDate, toDate) => {
     let bookingCount = 0;
 
     roomBookings?.forEach(booking => {
-        const bookingFrom = moment(booking?.fromDate,"DD-MMM-YYYY")
-        const bookingTo = moment(booking?.toDate,"DD-MMM-YYYY")
+        const bookingFrom = moment(booking?.fromDate, "DD-MMM-YYYY")
+        const bookingTo = moment(booking?.toDate, "DD-MMM-YYYY")
         if (
             moment(from).isBetween(bookingFrom, bookingTo) ||
             moment(to).isBetween(bookingFrom, bookingTo) ||
             moment(bookingFrom).isBetween(from, to) ||
-            moment(bookingTo).isBetween(from, to)
+            moment(bookingTo).isBetween(from, to) ||
+            moment(bookingTo).isSame(to) ||
+            moment(bookingFrom).isSame(from)
         ) {
-            bookingCount++;
+            if (booking?.quantity) {
+                bookingCount += booking?.quantity > 0 ? booking?.quantity : 1;
+            }
+            else {
+                bookingCount++;
+            }
         }
     })
 
-    const roomAvailibility = room?.totalRooms - bookingCount ;
+    const roomAvailibility = room?.totalRooms - bookingCount;
 
-    if(roomAvailibility < 1){
-        return 0 ;
+    if (roomAvailibility < 1) {
+        return 0;
     }
 
-    return roomAvailibility ;
+    return roomAvailibility;
 
 }

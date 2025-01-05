@@ -3,7 +3,7 @@ import Loader from "../loader.jsx";
 
 const Modal = ({ loading, onCancel, onConfirm, show, confirmText, cancelText, type = "confirm", title="Are you sure ?", desc }) => {
   return (
-    <div className={`w-full h-screen fixed top-0 left-0 ${show ? "flex" : "hidden"} justify-center items-center flex-col z-50 modal-bg`}>
+    <div className={`inset-0 w-full h-screen fixed top-0 left-0 ${show ? "flex" : "hidden"} justify-center items-center flex-col z-50 modal-bg`}>
       <div className='bg-white max-w-[400px] rounded-lg overflow-hidden'>
         <div
           className='flex p-4'

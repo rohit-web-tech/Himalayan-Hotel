@@ -94,8 +94,8 @@ export default function Footer() {
               <h4 className="heading">My Account</h4>
               <div className="user-options flex-box flex-column">
                 <Link className="details-footer" to="/login">Sign In</Link>
-                <Link className="details-footer" to="/userProfile">My Bookings</Link>
-                <Link className="details-footer" to="/userProfile">Track My Booking</Link>
+                <Link className="details-footer" to="/profile">My Profile</Link>
+                <Link className="details-footer" to="/profile/bookings">Track My Booking</Link>
                 <Link className="details-footer" to="/help">Help</Link>
               </div>
             </div>

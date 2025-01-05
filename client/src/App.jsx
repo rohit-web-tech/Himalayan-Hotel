@@ -19,6 +19,10 @@ import { fetchGetData } from "./lib/fetchData";
 import { useDispatch } from "react-redux";
 import { login, logout } from "./store/slice/user.slice";
 import Loader from "./components/loader";
+import RoomBookingPage from "./components/BookingForm";
+import BookingConfirmation from "./pages/BookingConfirmation/BookingConfirmation";
+import BookingDetails from "./pages/BookingDetails/BookingDetails";
+import ProfileLayout from "./pages/ProfileLayout/ProfileLayout";
 
 function App() {
   const dispatch = useDispatch();
@@ -53,9 +57,12 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route element={<ProtectedRoutes />}>
                 <Route path="/booking" element={<Booking />} />
+                <Route path="/booking/confirmation" element={<BookingConfirmation />} />
+                <Route path="/booking/:id" element={<RoomBookingPage />} />
                 <Route path="/about" element={<AboutUsPage />} />
                 <Route path="/contact" element={<ContactPage />} />
-                <Route path="/userprofile" element={<MyOrders />} />
+                <Route path="/profile/*" element={<ProfileLayout />} />
+                <Route path="/mybooking" element={<BookingDetails />} />
               </Route>
               <Route element={<AuthenticationRoutes />}>
                 <Route path="/login" element={<Login />} />

@@ -2,23 +2,21 @@ import { useEffect, useState } from 'react'
 import Table, { TD, TR } from './Table'
 import Header from './Header';
 import { message } from "antd";
-import RoomForm from './form/RoomForm';
-import Loader from './loader';
-import NoData from './NoData';
-import { fetchData, fetchGetData } from '../lib/fetchData';
-import Modal from './modal/Modal';
-import {useNavigate} from "react-router-dom" ;
+import Loader from "./loader.jsx"
+import NoData from "./NoData.jsx";
+import { fetchData, fetchGetData } from '../lib/fetchData.js';
+import Modal from './modal/Modal.jsx';
+import InventoryForm from './form/InventoryForm.jsx';
 
-const Rooms = () => {
-    const [rooms, setRooms] = useState([]);
+const Inventory = () => {
+    const [inventories, setInventories] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
-    const [editRoomData, seteditRoomData] = useState("");
+    const [editUserData, setEditUserData] = useState("");
     const [loading, setLoading] = useState(true);
     const [formSubmitLoading, setFormSubmitLoading] = useState(false);
     const [modalLoading, setModalLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const navigate = useNavigate();
     const [modalData, setModalData] = useState({
         title: "",
         desc: "",
@@ -31,94 +29,91 @@ const Rooms = () => {
         setShowModal(false);
     }
 
-    const getrooms = async () => {
-        const res = await fetchGetData("/room", setLoading);
+    const getInventories = async () => {
+        const res = await fetchGetData("/inventory/allWithQuantity", setLoading);
         if (res?.success) {
-            setRooms(res.data || []);
+            setInventories(res?.data || []);
         }
     }
 
     useEffect(() => {
-        getrooms();
+        getInventories();
     }, [])
 
-    const addNewRoom = async (room) => {
-        if (!room?.roomName || !room?.rent || !room?.totalRooms || !room?.imageUrl) {
+    const addNewUser = async (inventory) => {
+        if (!inventory?.name) {
             message.warning("Please fill all the fields!!");
             return;
         }
-
-        const res = await fetchData("/room", setFormSubmitLoading, "POST", room);
+        const res = await fetchData("/inventory", setFormSubmitLoading, "POST", inventory);
         if (res?.success) {
-            message.success("Room added successfully!!");
+            message.success("Inventory added successfully!!");
             setTimeout(() => {
-                getrooms();
+                getInventories();
                 closeForm();
             }, 1000)
         } else {
             message.error(res.message);
         }
-
     }
 
-    const editRoom = async (room) => {
-
-        const res = await fetchData("/room", setModalLoading, "PATCH", { roomId: room?._id, ...room });
+    const editInventory = async (inventory) => {
+        console.log(inventory)
+        const res = await fetchData("/inventory", setFormSubmitLoading, "PATCH", { _id : inventory?.item?._id, newName : inventory?.name})
         if (res?.success) {
-            message.success("Room details edited successfully!!");
+            message.success("Inventory details edited successfully!!");
             setTimeout(() => {
-                getrooms();
+                getInventories();
                 closeForm();
             }, 1000)
         } else {
             message.error(res.message);
         }
         closeModal();
-
     }
 
-    const handleEdit = (room) => {
-        
-        if (!room?.roomName || !room?.rent || !room?.totalRooms || !room?.imageUrl) {
+    const handleEdit = (inventory) => {
+
+        if (!inventory?.name) {
             message.warning("Please fill all the fields!!");
             return;
         }
 
         setModalData(() => (
             {
-                title: `Are you sure, you want to edit ${room?.roomName || "this room"} 's details ?`,
-                desc: `This action will edit ${room?.roomName || "this room"}'s details !!`,
+                title: `Are you sure, you want to edit ${inventory?.name || "inventory"} 's details ?`,
+                desc: `This action will edit ${inventory?.name || "inventory"}'s details !!`,
                 confirmText: "Confirm",
                 cancelText: "Cancel",
                 confirmHandler: () => {
-                    editRoom(room);
+                    editInventory(inventory);
                 }
             }
         ));
         setShowModal(true);
     }
 
-    const deleteRoom = async (room) => {
-        const res = await fetchData("/room", setModalLoading, "DELETE", { roomId: room?._id, ...room });
+    const deleteInventory = async (inventory) => {
+        const res = await fetchData("/inventory", setModalLoading, "DELETE", { _id: inventory?._id });
         if (res?.success) {
-            message.success("Room details deleted successfully!!");
-            getrooms();
+            message.success("Inventory details deleted successfully!!");
+            getInventories();
         } else {
             message.error(res.message);
         }
         closeModal();
     }
 
-    const handleDelete = (room) => {
+    const handleDelete = (inventory) => {
 
         setModalData(() => (
             {
-                title: `Are you sure, you want to delete ${room?.roomName ?? "Room"} ?`,
-                desc: `This action will permanently delete ${room?.roomName ?? "this room"} and can't be undo!!`,
+                title: `Are you sure, you want to delete ${inventory?.name || "inventory"} ?`,
+                desc: `This action will permanently delete ${inventory?.name || "inventory"} inventory and can't be undo!!`,
                 confirmText: "Delete",
                 cancelText: "Cancel",
                 confirmHandler: () => {
-                    deleteRoom(room);
+                    deleteInventory(inventory);
                 }
             }
         ));
@@ -128,37 +123,28 @@ const Rooms = () => {
     const closeForm = () => {
         setShowForm(false);
         setEditForm(false);
-        seteditRoomData("");
+        setEditUserData("");
         setSubmitHandler(() => { });
     }
 
     const tableFeilds = [
         "#",
         "Name",
-        "Rent",
-        "Total Rooms",
-        "Manage Inventory",
+        "Quantity",
         "Edit",
         "Delete"
     ]
 
     const rowData = () => {
-        return rooms?.map((room, i) => (
-            <TR key={rooms.id}>
+        return inventories?.map((inventory, i) => (
+            <TR key={inventory.id}>
                 <TD>{i + 1}</TD>
-                <TD>{room?.roomName || "Room"}</TD>
-                <TD>{room?.rent || "00"}</TD>
-                <TD>{room?.totalRooms || "1"}</TD>
-                <TD><button
-                    className='bg-yellow-500 py-1 px-6 text-white rounded-lg text-xs'
-                    onClick={() => {
-                        navigate(`/rooms/${room?._id}`)
-                    }}
-                >Inventory</button></TD>
+                <TD>{inventory?.item?.name || "Unknown"}</TD>
+                <TD>{inventory?.totalQuantity || 0}</TD>
                 <TD><button
                     className='bg-blue-600 py-1 px-6 text-white rounded-lg text-xs'
                     onClick={() => {
-                        seteditRoomData(room);
+                        setEditUserData(inventory);
                         setEditForm(true);
                         setShowForm(true);
                     }}
@@ -166,7 +152,7 @@ const Rooms = () => {
                 <TD><button
                     className='bg-red-600 py-1 px-6 text-white rounded-lg text-xs'
                     onClick={() => {
-                        handleDelete(room);
+                        handleDelete(inventory);
                     }}
                 >Delete</button></TD>
             </TR>
@@ -174,7 +160,7 @@ const Rooms = () => {
     }
 
     return (
-        <div className='flex flex-col  w-full md:w-[calc(100%-300px)]  min-h-screen sm:px-14 px-6 py-3'>
+        <div className='flex flex-col w-full md:w-[calc(100%-300px)] sm:px-14 px-6 py-3'>
             <Modal
                 show={showModal}
                 confirmText={modalData?.confirmText}
@@ -188,26 +174,24 @@ const Rooms = () => {
             />
             {
                 loading ? (
-                    <Loader styles="h-10 w-10 my-[calc(50vh-40px)]" />
+                    <Loader styles='w-10 h-10 my-[calc(50vh-40px)]' />
                 ) :
                     !showForm ? (
                         <>
                             <Header
-                                title="Rooms"
+                                title="Inventory"
                                 handleBtn={() => {
                                     setShowForm(true);
                                 }}
-                                btnText="Add new room"
+                                btnText="Add new inventory"
                             />
                             {
-                                rooms?.length < 1 ? (
-                                    <>
-                                        <div className='h-[calc(100vh-100px)] flex justify-center items-center'>
-                                            <NoData
-                                                title='No Room Data found !!'
-                                            />
-                                        </div>
-                                    </>
+                                inventories?.length < 1 ? (
+                                    <div className='h-screen flex justify-center items-center'>
+                                        <NoData
+                                            title='No Inventory found !!'
+                                        />
+                                    </div>
                                 ) : (
                                     <>
                                         <Table tableFields={tableFeilds} tableRows={rowData} />
@@ -215,21 +199,21 @@ const Rooms = () => {
                                 )
                             }
                         </>
-
                     ) : (
-                        <RoomForm
-                            title="Add new room"
+                        <InventoryForm
+                            title="Create New Inventory"
                             edit={editForm}
-                            initialUserData={editRoomData}
+                            initialUserData={editUserData}
                             goBackHandler={closeForm}
-                            submitHandler={editForm ? handleEdit : addNewRoom}
+                            submitHandler={editForm ? handleEdit : addNewUser}
                             loading={formSubmitLoading}
                         />
                     )
+
             }
 
         </div>
     )
 }
 
-export default Rooms
+export default Inventory ;

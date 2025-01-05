@@ -113,7 +113,7 @@ const Navbar = () => {
               }
             </ul>
             {
-              isLoggedIn && <FaUserCircle onClick={() => { navigate("/userprofile") }} className="cursor-pointer hover:text-slate-400 text-[--secondary-color] text-[32px] sm:block hidden" />
+              isLoggedIn && <FaUserCircle onClick={() => { navigate("/profile") }} className="cursor-pointer hover:text-slate-400 text-[--secondary-color] text-[32px] sm:block hidden" />
             }
             {
               showSideNav ? (
@@ -144,7 +144,7 @@ const Navbar = () => {
                       <LI value="Book Room" endpoint="/booking" handleClick={() => setShowSideNav(false)} />
                       <LI value="About Us" endpoint="/about" handleClick={() => setShowSideNav(false)} />
                       <LI value="Contact Us" endpoint="/contact" handleClick={() => setShowSideNav(false)} />
-                      <LI value="My Bookings" endpoint="/userprofile" handleClick={() => setShowSideNav(false)} />
+                      <LI value="My Bookings" endpoint="/profile" handleClick={() => setShowSideNav(false)} />
                     </>
                   ) : (
                     <>
