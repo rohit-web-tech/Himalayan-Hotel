@@ -1,22 +1,18 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import Loader from "../../components/loader";
-import { fetchData, fetchGetData } from "../../lib/fetchData";
-import ContentWrapper from "../../components/contentWrapper/ContentWrapper";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
-import Modal from "../../components/modal/Modal";
 import { message } from "antd";
-import { makeDateTimeReadable } from "../../lib/CommonFunctions";
+import Modal from "./modal/Modal";
+import Loader from "./loader";
+import { fetchData, fetchGetData } from "../lib/fetchData";
 
 const BookingDetails = () => {
 
     const [members, setMembers] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [booking, setBooking] = useState({});
+    const { id: bookingId } = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const bookingId = searchParams.get('id');
     const [loading, setLoading] = useState(true);
     const [modalLoading, setModalLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -33,9 +29,10 @@ const BookingDetails = () => {
     }
 
     const getBookingDetails = async () => {
+        console.log(bookingId)
         if (!bookingId) {
             message.warning("Booking Id is required");
-            navigate("/profile/bookings");
+            navigate("/bookings");
         }
         const res = await fetchGetData(`/booking/${bookingId}`, setLoading);
         if (!res.success) {
@@ -137,7 +134,7 @@ const BookingDetails = () => {
                 type="confirm"
                 onCancel={closeModal}
             />
-            <div className="min-h-screen bg-gray-50 py-6">
+            <div className="min-h-screen bg-gray-50 w-full md:w-[calc(100%-300px)] sm:px-14 px-6 py-3">
                 {
                     loading ?
                         (
@@ -145,17 +142,14 @@ const BookingDetails = () => {
                         )
                         :
                         (
-                            <ContentWrapper>
-                                <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-                                    Booking Details
-                                </h1>
+                            <>
 
                                 <div className="bg-white shadow-lg rounded-lg p-6">
                                     <div className="flex items-center gap-4 mb-4">
                                         <button
                                             type="button"
                                             className="text-[--primary-color] hover:text-gray-600 text-2xl font-bold"
-                                            onClick={() => navigate("/profile/bookings")}
+                                            onClick={() => navigate("/bookings")}
                                         >
                                             <FaArrowLeft />
                                         </button>
@@ -188,7 +182,7 @@ const BookingDetails = () => {
 
                                         <p className="text-sm text-gray-500">
                                             Booked On:{" "}
-                                            <span className="font-medium">{makeDateTimeReadable(booking?.createdAt)}</span>
+                                            <span className="font-medium">{booking?.createdAt}</span>
                                         </p>
                                         <p
                                             className={`text-sm font-medium ${booking?.status === "cancelled" ? "text-red-600" : "text-green-600"
@@ -313,6 +307,26 @@ const BookingDetails = () => {
                                         )}
                                     </div>
 
+                                    <div className="mb-6">
+
+                                        <h3 className="text-lg font-medium text-gray-700">Booker's Details</h3>
+                                        <div className="bg-gray-100 p-4 rounded-lg">
+                                            <p className="text-sm text-gray-500">
+                                                Name:{" "}
+                                                <span className="font-medium">{booking?.bookedBy?.name}</span>
+                                            </p>
+                                            <p className="text-sm text-gray-500">
+                                                Email:{" "}
+                                                <span className="font-medium">{booking?.bookedBy?.email}</span>
+                                            </p>
+                                            <p className="text-sm text-gray-500">
+                                                Contact Number:{" "}
+                                                <span className="font-medium">{booking?.bookedBy?.contactNumber}</span>
+                                            </p>
+                                        </div>
+
+                                    </div>
+
                                     <div className="flex items-center justify-between">
                                         {!isEditing && booking?.status === "booked" && (
                                             <button
@@ -334,7 +348,7 @@ const BookingDetails = () => {
                                         }
                                     </div>
                                 </div>
-                            </ContentWrapper>
+                            </>
 
                         )
                 }

@@ -26,8 +26,7 @@ const fetchGetData = async (endPoint = "", setLoading = () => { }) => {
         setLoading(true);
         const res = await fetch(`${BASE_URL}${endPoint}`,{
             credentials: 'include'
-        })
-        console.log(res);
+        });
         const data = await res.json();
         return data;
     } catch (error) {

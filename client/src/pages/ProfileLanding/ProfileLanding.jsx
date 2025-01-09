@@ -2,13 +2,9 @@ import React from "react";
 import { FaUserCircle, FaBook, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const ProfileLandingPage = () => {
+const ProfileLandingPage = ({handleLogOut = ()=>{}}) => {
 
     const navigate = useNavigate();
-    const handleLogout = () => {
-        // Implement logout logic here
-        console.log("Logged out");
-    };
 
     return (
         <div className="bg-gray-100 flex flex-col items-center py-10 mt-6">
@@ -45,7 +41,7 @@ const ProfileLandingPage = () => {
 
                 {/* Logout Box */}
                 <div
-                    onClick={handleLogout}
+                    onClick={handleLogOut}
                     className="bg-white shadow-lg rounded-lg p-6 hover:shadow-2xl transition-all cursor-pointer"
                 >
                     <div className="flex items-center justify-center text-red-500 text-4xl mb-4">

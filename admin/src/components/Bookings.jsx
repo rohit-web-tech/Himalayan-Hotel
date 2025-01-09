@@ -2,18 +2,21 @@ import { useEffect, useState } from 'react'
 import Table, { TD, TR } from './Table'
 import Loader from './loader';
 import NoData from './NoData';
-import {fetchGetData} from "../lib/fetchData.js"
+import { fetchGetData } from "../lib/fetchData.js"
+import {useNavigate} from "react-router-dom";
 
 const Bookings = () => {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const getBookings = async () => {
         try {
-            const res = await fetchGetData(`/booking/all`,setLoading)
-            if(res?.success){
+            const res = await fetchGetData(`/booking/admin/all`, setLoading)
+            if (res?.success) {
                 setBookings(res?.data)
             }
+            console.log(res)
         } catch (error) {
             console.log(error)
         }
@@ -30,24 +33,25 @@ const Bookings = () => {
         "Rent",
         "From",
         "To",
-        "TotalDays",
-        "CustomerName",
-        "CustomerEmail",
+        "Total Rent",
+        "Payment Mode",
         "Status",
     ]
 
     const rowData = () => {
         return bookings?.map((booking, i) => (
-            <TR key={booking.id}>
+            <TR
+                key={booking._id}
+                clickHandler={() => navigate(`/booking/${booking?._id}`)}
+            >
                 <TD>{i + 1}</TD>
                 <TD><img src={booking?.room?.imageUrl || ""} alt="" className='h-6 w-14' /></TD>
                 <TD>{booking?.room?.roomName || "1"}</TD>
                 <TD>{booking?.totalAmount || "00"}</TD>
                 <TD>{booking?.fromDate || "00"}</TD>
                 <TD>{booking?.toDate || "00"}</TD>
-                <TD>{booking?.totalDays || "00"}</TD>
-                <TD>{booking?.user?.name || "Guest"}</TD>
-                <TD>{booking?.user?.email || "guest@guest.com"}</TD>
+                <TD>{booking?.payment ? (booking?.payment?.amount / 100) : booking?.totalAmount || "00"}</TD>
+                <TD>{booking?.paymentMode || "PaymentMode"}</TD>
                 <TD>{booking?.status == "booked" ? (
                     <span className="bg-green-500 text-white p-2 rounded-md text-xs">Booked</span>
                 ) : booking?.status == "cancelled" ? (

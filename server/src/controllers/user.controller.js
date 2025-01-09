@@ -179,8 +179,9 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     if (!admin) {
         throw new ApiError(400, "Please login with right credentials!!");
     }
-
+    
     const isPasswordCorrect = await admin.isCorrectPassword(password);
+
 
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Please login with right credentials!!");
@@ -362,6 +363,44 @@ export const editUser = asyncHandler(async (req, res) => {
                 200,
                 allUsers,
                 "User's details updated successfully !!"
+            )
+        )
+
+});
+
+export const updateUserDetails = asyncHandler(async (req, res) => {
+
+    const { name, contactNumber } = req.body;
+    const {_id : userId} = req?.user ;
+
+    if (!name || !contactNumber) {
+        throw new ApiError(400, "All fields are required!!");
+    }
+
+    if (!userId) {
+        throw new ApiError(400, "UserId is required !!")
+    }
+
+    const updatedProfile = await User.findByIdAndUpdate(
+        userId,
+        {
+            $set: {
+                name,
+                contactNumber
+            }
+        },
+        {
+            new : true
+        }
+    ).select("name email contactNumber _id isAdmin isVerified");
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                updatedProfile,
+                "Your details updated successfully !!"
             )
         )
 

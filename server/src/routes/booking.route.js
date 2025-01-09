@@ -7,9 +7,10 @@ import {
     getSpecificBookingDetails,
     getUserBookings,
     handleCashBooking,
-    initiateRoomBooking
+    initiateRoomBooking,
+    updateMembersInfo
 } from "../controllers/booking.controller.js"; 
-import {adminAuth, auth} from "../middlewares/auth.middleware.js";
+import {auth,adminAuth} from "../middlewares/auth.middleware.js"
 import { createPaymentOrder, verifyPayment } from "../controllers/payments.controller.js";
 const router = express.Router();
 
@@ -18,6 +19,9 @@ router.route("/")
 
 router.route("/:id")
 .get(auth,getSpecificBookingDetails)
+
+router.route("/member")
+.patch(auth,updateMembersInfo);
 
 router.route("/prepaid/paymentOrder")
 .post(auth,initiateRoomBooking,createPaymentOrder);
@@ -31,7 +35,7 @@ router.route("/cash")
 router.route("/cancel")
 .delete(auth,cancelBooking)
 
-router.route("/all")
+router.route("/admin/all")
 .get(auth,adminAuth,getAllBookings);
 
 export default router ;

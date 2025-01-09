@@ -11,6 +11,7 @@ import {
     refreshAccessToken,
     registerAdmin, 
     registerUser,
+    updateUserDetails,
     verifyEmail
 } from "../controllers/user.controller.js";
 import {
@@ -32,6 +33,7 @@ router.route("/registerAdmin").post(auth,adminAuth,registerAdmin);
 router.route("/currentUser").get(auth,getCurrentUser);
 router.route("/logout").get(auth,logout);
 router.route("/refreshToken").post(refreshAccessToken);
+router.route("/updateMyInfo").patch(auth,updateUserDetails);
 
 router.post("/enquiry", async (req, res) => {
     try {

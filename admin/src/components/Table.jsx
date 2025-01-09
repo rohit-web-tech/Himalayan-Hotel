@@ -8,10 +8,10 @@ export const TD = ({ children }) => {
     )
 }
 
-export const TR = ({ clickHandler = () => { }, children }) => {
+export const TR = ({ clickHandler = () => { }, children, className = ""}) => {
     return (
         <tr
-            className="bg-white border-b border-gray-400"
+            className={`bg-white border-b border-gray-400 cursor-pointer hover:bg-neutral-100 ${className}`}
             onClick={clickHandler}
         >
             {children}
@@ -19,7 +19,7 @@ export const TR = ({ clickHandler = () => { }, children }) => {
     )
 }
 
-const Table = ({ tableFields = [], tableRows = ()=>"" }) => {
+const Table = ({ tableFields = [], tableRows = () => "" }) => {
     return (
         <div className="flex flex-col w-full max-h-[calc(100vh-100px)]">
             <div className="overflow-x-auto sm:mx-0.5 lg:mx-0.5">

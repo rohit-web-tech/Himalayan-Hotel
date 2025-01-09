@@ -89,7 +89,6 @@ export const bookRoom = asyncHandler(async (req, res) => {
             });
 
             await newMember.save();
-            console.log(newMember);
             memberIds.push(newMember?._id);
         }
 
@@ -130,8 +129,7 @@ export const bookRoom = asyncHandler(async (req, res) => {
         });
 
         await newBooking.save();
-        await roomBookingMail(room?.roomName, req?.user, FromDate, ToDate);
-
+        await roomBookingMail(room, req?.user, FromDate, ToDate, newBooking,req?.payment?.amount || amount, members);
         res
             .status(201)
             .json(
@@ -150,6 +148,43 @@ export const bookRoom = asyncHandler(async (req, res) => {
         throw new ApiError(error?.status || error?.statusCode || 400, error?.message || "Something went wrong");
 
     }
+});
+
+export const updateMembersInfo = asyncHandler(async (req, res) => {
+
+    const members = req?.body;
+
+    if (!Array.isArray(members) || !members.length) {
+        throw new ApiError(400, "Member details are required !!");
+    }
+
+    for (let i = 0; i < members?.length; i++) {
+        const member = members[i];
+        if (!member?._id || !member?.name || !member?.age || !member?.adhaar || isNaN(member?.adhaar) || member?.adhaar?.length !== 12) {
+            throw new ApiError(400, "All fields are required and Adhaar number should be 12 digit !!");
+        }
+        await Customer?.findByIdAndUpdate(
+            member?._id,
+            {
+                $set: {
+                    name: member?.name,
+                    age: member?.age,
+                    adhaar: member?.adhaar
+                }
+            }
+        );
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                [],
+                "Member details updated successfully !!"
+            )
+        );
+
 });
 
 export const getUserBookings = asyncHandler(async (req, res) => {
@@ -227,16 +262,17 @@ export const getUserBookings = asyncHandler(async (req, res) => {
                 totaldays: 1,
                 totalAmount: 1,
                 status: 1,
-                quantity:1,
-                refundedAmount:1,
-                paymentMode:1,
-                members:1,
+                quantity: 1,
+                refundedAmount: 1,
+                paymentMode: 1,
+                members: 1,
                 room: {
                     $arrayElemAt: ["$room", 0]
                 },
                 payment: {
                     $arrayElemAt: ["$payment", 0]
-                }
+                },
+                createdAt: 1
             }
         }
     ]);
@@ -344,11 +380,26 @@ export const getAllBookings = asyncHandler(async (_, res) => {
                             orderId: 1,
                             status: 1,
                             amount: 1,
-                            currency: 1,
-                            email: 1,
-                            contact: 1,
+                            method: 1,
                             refundId: 1,
-                            method: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "bookedBy",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1,
+                            email: 1,
+                            contactNumber: 1,
                         }
                     }
                 ]
@@ -357,21 +408,18 @@ export const getAllBookings = asyncHandler(async (_, res) => {
         {
             $project: {
                 _id: 1,
+                room: { $arrayElemAt: ["$room", 0] },
+                members: 1,
+                payment: { $arrayElemAt: ["$payment", 0] },
+                bookedBy: { $arrayElemAt: ["$bookedBy", 0] },
                 fromDate: 1,
                 toDate: 1,
-                totaldays: 1,
+                totalDays: 1,
                 totalAmount: 1,
+                paymentMode: 1,
                 status: 1,
-                quantity:1,
-                refundedAmount:1,
-                paymentMode:1,
-                members:1,
-                room: {
-                    $arrayElemAt: ["$room", 0]
-                },
-                payment: {
-                    $arrayElemAt: ["$payment", 0]
-                }
+                createdAt: 1,
+                updatedAt: 1,
             }
         }
     ]);
@@ -390,16 +438,16 @@ export const getAllBookings = asyncHandler(async (_, res) => {
 
 export const getSpecificBookingDetails = asyncHandler(async (req, res) => {
 
-    const {id} = req?.params;
+    const { id } = req?.params;
 
-    if(!id){
-        throw new ApiError(400,"Booking id is required!!");
+    if (!id) {
+        throw new ApiError(400, "Booking id is required!!");
     }
 
     const bookings = await Booking.aggregate([
         {
-            $match : {
-                _id : mongoose.Types.ObjectId(id)
+            $match: {
+                _id: mongoose.Types.ObjectId(id)
             }
         },
         {
@@ -462,6 +510,24 @@ export const getSpecificBookingDetails = asyncHandler(async (req, res) => {
             }
         },
         {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "bookedBy",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1,
+                            email: 1,
+                            contactNumber: 1,
+                        }
+                    }
+                ]
+            }
+        },
+        {
             $project: {
                 _id: 1,
                 fromDate: 1,
@@ -469,16 +535,20 @@ export const getSpecificBookingDetails = asyncHandler(async (req, res) => {
                 totaldays: 1,
                 totalAmount: 1,
                 status: 1,
-                quantity:1,
-                refundedAmount:1,
-                paymentMode:1,
-                members:1,
+                quantity: 1,
+                refundedAmount: 1,
+                paymentMode: 1,
+                members: 1,
                 room: {
                     $arrayElemAt: ["$room", 0]
                 },
                 payment: {
                     $arrayElemAt: ["$payment", 0]
-                }
+                },
+                bookedBy: {
+                    $arrayElemAt: ["$bookedBy", 0]
+                },
+                createdAt: 1
             }
         }
     ]);

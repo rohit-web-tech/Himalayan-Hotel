@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { fetchGetData } from "./lib/fetchData.js";
 import Inventory from "./components/Inventory.jsx";
 import RoomInventory from "./components/RoomInventory.jsx";
+import BookingDetails from "./components/BookingDetails.jsx";
  
 function App() {
 
@@ -57,6 +58,7 @@ function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/booking/:id" element={<BookingDetails />} />
               <Route path="/*" element={<PageNotFound type="login" />} />
             </Route>
             <Route element={<AuthenticationRoutes />}>
