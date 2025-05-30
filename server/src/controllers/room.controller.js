@@ -22,7 +22,8 @@ export const getRooms = asyncHandler(async (req, res) => {
 
 export const addRoom = asyncHandler(async (req, res) => {
 
-    const { roomName, rent, imageUrl, totalRooms } = req.body;
+    const { roomName, rent, totalRooms } = req.body;
+    const imageUrl = req?.file ;
 
     if (!roomName || !rent || !imageUrl || !totalRooms) {
         throw new ApiError(400, "All feilds are required!!");
@@ -31,7 +32,7 @@ export const addRoom = asyncHandler(async (req, res) => {
     const newRoom = await Room.create({
         roomName,
         rent,
-        imageUrl,
+        imageUrl : imageUrl?.filename,
         totalRooms
     });
 
@@ -51,11 +52,18 @@ export const addRoom = asyncHandler(async (req, res) => {
 
 export const editRoom = asyncHandler(async (req, res) => {
 
-    const { _id, roomName, rent, imageUrl, totalRooms } = req.body;
+    const { _id, roomName, rent, image, totalRooms } = req.body;
+    const updatedImage = req?.file ;
 
-    if (!roomName || !rent || !imageUrl || !totalRooms || !_id) {
+    console.log(!updatedImage && !image)
+
+    console.log( _id, roomName, rent, image, totalRooms)
+
+    if (!roomName || !rent || (!updatedImage && !image) || !totalRooms || !_id) {
         throw new ApiError(400, "All feilds are required!!");
     }
+
+    const imageUrl = updatedImage?.filename || image ;
 
     await Room.findByIdAndUpdate(
         _id,

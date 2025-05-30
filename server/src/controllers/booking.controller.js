@@ -3,11 +3,13 @@ import ApiError from "../lib/apiError.js";
 import ApiResponse from "../lib/apiResponse.js";
 import asyncHandler from "../lib/asyncHandler.js";
 import { getRoomAvailibility } from "../lib/commonFunction.js";
-import { roomBookingMail } from "../lib/mailsender.js";
+import { checkInOtpMail, checkOutOtpMail, roomBookingMail } from "../lib/mailsender.js";
 import Booking from "../models/booking.model.js";
 import Room from "../models/room.model.js";
 import mongoose from "mongoose";
 import Customer from "../models/customer.model.js";
+import { generateOTP } from "../lib/const.js";
+import User from "../models/user.model.js";
 
 export const initiateRoomBooking = asyncHandler(async (req, _, next) => {
 
@@ -89,7 +91,6 @@ export const bookRoom = asyncHandler(async (req, res) => {
             });
 
             await newMember.save();
-            console.log(newMember);
             memberIds.push(newMember?._id);
         }
 
@@ -125,13 +126,12 @@ export const bookRoom = asyncHandler(async (req, res) => {
             payment: req?.payment?.id,
             quantity: roomQuantity,
             paymentMode,
-            status: "booked",
+            status: "Booked",
             members: memberIds
         });
 
         await newBooking.save();
-        await roomBookingMail(room?.roomName, req?.user, FromDate, ToDate);
-
+        await roomBookingMail(room, req?.user, FromDate, ToDate, newBooking, req?.payment?.amount || amount, members);
         res
             .status(201)
             .json(
@@ -150,6 +150,43 @@ export const bookRoom = asyncHandler(async (req, res) => {
         throw new ApiError(error?.status || error?.statusCode || 400, error?.message || "Something went wrong");
 
     }
+});
+
+export const updateMembersInfo = asyncHandler(async (req, res) => {
+
+    const members = req?.body;
+
+    if (!Array.isArray(members) || !members.length) {
+        throw new ApiError(400, "Member details are required !!");
+    }
+
+    for (let i = 0; i < members?.length; i++) {
+        const member = members[i];
+        if (!member?._id || !member?.name || !member?.age || !member?.adhaar || isNaN(member?.adhaar) || member?.adhaar?.length !== 12) {
+            throw new ApiError(400, "All fields are required and Adhaar number should be 12 digit !!");
+        }
+        await Customer?.findByIdAndUpdate(
+            member?._id,
+            {
+                $set: {
+                    name: member?.name,
+                    age: member?.age,
+                    adhaar: member?.adhaar
+                }
+            }
+        );
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                [],
+                "Member details updated successfully !!"
+            )
+        );
+
 });
 
 export const getUserBookings = asyncHandler(async (req, res) => {
@@ -227,16 +264,17 @@ export const getUserBookings = asyncHandler(async (req, res) => {
                 totaldays: 1,
                 totalAmount: 1,
                 status: 1,
-                quantity:1,
-                refundedAmount:1,
-                paymentMode:1,
-                members:1,
+                quantity: 1,
+                refundedAmount: 1,
+                paymentMode: 1,
+                members: 1,
                 room: {
                     $arrayElemAt: ["$room", 0]
                 },
                 payment: {
                     $arrayElemAt: ["$payment", 0]
-                }
+                },
+                createdAt: 1
             }
         }
     ]);
@@ -268,7 +306,7 @@ export const cancelBooking = asyncHandler(async (req, res) => {
         },
         {
             $set: {
-                status: "cancelled"
+                status: "Cancelled"
             }
         },
         {
@@ -344,37 +382,59 @@ export const getAllBookings = asyncHandler(async (_, res) => {
                             orderId: 1,
                             status: 1,
                             amount: 1,
-                            currency: 1,
-                            email: 1,
-                            contact: 1,
-                            refundId: 1,
-                            method: 1
+                            method: 1,
+                            refundId: 1
                         }
                     }
                 ]
             }
         },
         {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "bookedBy",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1,
+                            email: 1,
+                            contactNumber: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                room: { $arrayElemAt: ["$room", 0] },
+                payment: { $arrayElemAt: ["$payment", 0] },
+                bookedBy: { $arrayElemAt: ["$bookedBy", 0] }
+            }
+        },
+        {
             $project: {
                 _id: 1,
+                roomId: "$room._id",
+                roomName: "$room.roomName",
+                roomImage: "$room.imageUrl",
+                bookerName: "$bookedBy.name",
+                payment: 1,
+                bookedBy: 1,
                 fromDate: 1,
                 toDate: 1,
-                totaldays: 1,
+                totalDays: 1,
                 totalAmount: 1,
+                paymentMode: 1,
                 status: 1,
-                quantity:1,
-                refundedAmount:1,
-                paymentMode:1,
-                members:1,
-                room: {
-                    $arrayElemAt: ["$room", 0]
-                },
-                payment: {
-                    $arrayElemAt: ["$payment", 0]
-                }
+                createdAt: 1,
+                updatedAt: 1
             }
         }
     ]);
+
 
     res
         .status(200)
@@ -388,18 +448,199 @@ export const getAllBookings = asyncHandler(async (_, res) => {
 
 });
 
+export const initiateCheckIn = asyncHandler(async (req, res) => {
+
+    const { id } = req?.params;
+
+    if (!id) {
+        throw new ApiError(400, "Booking id is required!!");
+    }
+
+    const booking = await Booking.findOne({
+        _id: id,
+        status: "Booked"
+    }).populate("user");
+
+    if (!booking) {
+        throw new ApiError(400, "Invalid check-in request !!");
+    }
+
+    const OTP = generateOTP();
+
+    await Booking.updateOne({
+        _id: id
+    }, {
+        $set: {
+            OTP
+        }
+    });
+
+    await checkInOtpMail(booking?.user,OTP);
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                [],
+                "OTP has been sent to customer email !!"
+            )
+        );
+
+})
+
+export const checkIn = asyncHandler(async (req, res) => {
+
+    const { id,otp } = req?.body;
+
+    if (!id || !otp) {
+        throw new ApiError(400, "Booking id and OTP are required!!");
+    }
+
+    const booking = await Booking.findOne({
+        _id: id,
+        status: "Booked",
+        OTP: otp
+    }).populate("user");
+
+    if (!booking) {
+        throw new ApiError(400, "Invalid OTP !!");
+    }
+
+    booking.OTP = undefined ;
+    booking.status = "Checked In" ;
+
+    await booking.save();
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                [],
+                "Checked in successfully !"
+            )
+        );
+
+})
+
+export const initiateCheckOut = asyncHandler(async (req, res) => {
+
+    const { id } = req?.params;
+
+    if (!id) {
+        throw new ApiError(400, "Booking id is required!!");
+    }
+
+    const booking = await Booking.findOne({
+        _id: id,
+        status: "Checked In"
+    }).populate("user");
+
+    if (!booking) {
+        throw new ApiError(400, "Invalid check-out request !!");
+    }
+
+    const OTP = generateOTP();
+
+    await Booking.updateOne({
+        _id: id
+    }, {
+        $set: {
+            OTP
+        }
+    });
+
+    await checkOutOtpMail(booking?.user,OTP);
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                [],
+                "OTP has been sent to customer email !!"
+            )
+        );
+
+})
+
+export const checkOut = asyncHandler(async (req, res) => {
+
+    const { id,otp } = req?.body;
+
+    if (!id || !otp) {
+        throw new ApiError(400, "Booking id and OTP are required!!");
+    }
+
+    const booking = await Booking.findOne({
+        _id: id,
+        status: "Checked In",
+        OTP: otp
+    }).populate("user");
+
+    if (!booking) {
+        throw new ApiError(400, "Invalid OTP !!");
+    }
+
+    booking.OTP = undefined ;
+    booking.status = "Checked Out" ;
+
+    await booking.save();
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                [],
+                "Checked out successfully !"
+            )
+        );
+
+})
+
+export const getAllCounts = asyncHandler(async(_,res)=>{
+    const admins = await User?.find({
+        isAdmin : true,
+        isPrimary : false
+    })
+    const rooms = await Room?.find({})
+    const bookings = await Booking?.find({})
+    const users = await User?.find({
+        isAdmin : false,
+        isVerified : true
+    })
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    rooms : rooms?.length,
+                    users : users?.length,
+                    admins : admins?.length,
+                    bookings : bookings?.length,
+                },
+                "Whole data retrieved successfully !!"
+            )
+        );
+
+})
+
 export const getSpecificBookingDetails = asyncHandler(async (req, res) => {
 
-    const {id} = req?.params;
+    const { id } = req?.params;
 
-    if(!id){
-        throw new ApiError(400,"Booking id is required!!");
+    if (!id) {
+        throw new ApiError(400, "Booking id is required!!");
     }
 
     const bookings = await Booking.aggregate([
         {
-            $match : {
-                _id : mongoose.Types.ObjectId(id)
+            $match: {
+                _id: mongoose.Types.ObjectId(id)
             }
         },
         {
@@ -462,6 +703,24 @@ export const getSpecificBookingDetails = asyncHandler(async (req, res) => {
             }
         },
         {
+            $lookup: {
+                from: "users",
+                localField: "user",
+                foreignField: "_id",
+                as: "bookedBy",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1,
+                            email: 1,
+                            contactNumber: 1,
+                        }
+                    }
+                ]
+            }
+        },
+        {
             $project: {
                 _id: 1,
                 fromDate: 1,
@@ -469,16 +728,20 @@ export const getSpecificBookingDetails = asyncHandler(async (req, res) => {
                 totaldays: 1,
                 totalAmount: 1,
                 status: 1,
-                quantity:1,
-                refundedAmount:1,
-                paymentMode:1,
-                members:1,
+                quantity: 1,
+                refundedAmount: 1,
+                paymentMode: 1,
+                members: 1,
                 room: {
                     $arrayElemAt: ["$room", 0]
                 },
                 payment: {
                     $arrayElemAt: ["$payment", 0]
-                }
+                },
+                bookedBy: {
+                    $arrayElemAt: ["$bookedBy", 0]
+                },
+                createdAt: 1
             }
         }
     ]);

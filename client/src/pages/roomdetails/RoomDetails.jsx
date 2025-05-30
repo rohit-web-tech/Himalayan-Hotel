@@ -2,6 +2,7 @@ import React from "react";
 import { RiStarSFill } from "react-icons/ri";
 
 const RoomDetails = ({ setShowDetails , roomDetails , handleBook , roomId}) => {
+  const SERVER_URL = import.meta.env.VITE_BASE_URL ;
   return (
     <div class="relative z-50" role="dialog" aria-modal="true">
       <div class="fixed inset-0 hidden bg-gray-500 bg-opacity-75 transition-opacity md:block"></div>
@@ -35,7 +36,7 @@ const RoomDetails = ({ setShowDetails , roomDetails , handleBook , roomId}) => {
               <div class="grid w-full grid-cols-1 items-center gap-x-6 gap-y-8 sm:grid-cols-12 lg:gap-x-8">
                 <div class="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5">
                   <img
-                    src={roomDetails?.imageUrl}
+                    src={SERVER_URL + roomDetails?.imageUrl}
                     alt={roomDetails?.roomName}
                     class="object-cover object-center w-full"
                   />

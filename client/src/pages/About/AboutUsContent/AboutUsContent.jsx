@@ -4,6 +4,7 @@ import "./style.css";
 import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
 import Img from "../../../components/lazyloading/Img";
 export default function About({ src, showBtn,data }) {
+  const SERVER_URL = import.meta.env.VITE_BASE_URL ;
   const navigate = useNavigate();
   return (
     <div
@@ -13,7 +14,7 @@ export default function About({ src, showBtn,data }) {
       <ContentWrapper>
         <div className="element-card">
           <div className="image flex-box justify-center align-center bg-gray-600">
-            <Img src={data?.imageUrl || src} className="h-96" />
+            <Img src={SERVER_URL + data?.imageUrl || src} className="h-96" />
           </div>
           <div className="element-content flex-box justify-center flex-column">
             <h1 className=" text-[--primary-color]">

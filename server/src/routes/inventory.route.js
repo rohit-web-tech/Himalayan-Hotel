@@ -12,10 +12,11 @@ import {
 import { Router } from "express";
 import { adminAuth, auth } from "../middlewares/auth.middleware.js";
 const router = Router();
+import {upload} from "../middlewares/multer.middleware.js";
 
 router.route("/")
-    .post(auth, adminAuth, AddInventory)
-    .patch(auth, adminAuth, EditInventory)
+    .post(auth, adminAuth, upload.single("image"),  AddInventory)
+    .patch(auth, adminAuth, upload.single("image"), EditInventory)
     .delete(auth, adminAuth, deleteInventory)
 
 router.route("/all")

@@ -1,9 +1,22 @@
 import nodemailer from 'nodemailer';
 import Booking from '../models/booking.model.js';
-import Room from '../models/room.model.js';
 import "dotenv/config.js";
 
-const client = process.env.CLIENT_URI ;
+const client = process.env.CLIENT_URI;
+
+const makeDateTimeReadable = (DateTime = "") => {
+    // Convert ISO string to Date object
+    const date = new Date(DateTime);
+
+    // Format the date to a more readable format
+    const readableDate = date.toLocaleString("en-US", {
+        year: "numeric", // Four-digit year
+        month: "long",   // Full name of the month
+        day: "numeric",  // Numeric day
+    });
+
+    return readableDate;
+}
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -24,14 +37,14 @@ function sendEmail(mailOptions) {
 }
 
 export async function sendPreAlertMail(date) {
-    const bookings = await Booking.find({ toDate: date, status : "booked"});
+    const bookings = await Booking.find({ toDate: date, status: "booked" });
     if (bookings.length > 0) {
         bookings.forEach(booking => {
-                let mailOptions = {
-                    from: process.env.myEmail,
-                    to: booking.userEmail,
-                    subject: 'PRE CHECK OUT ALERT FROM THE HIMALAYAN HOTEL',
-                    html: `
+            let mailOptions = {
+                from: process.env.myEmail,
+                to: booking.userEmail,
+                subject: 'PRE CHECK OUT ALERT FROM THE HIMALAYAN HOTEL',
+                html: `
                     <div style="width:100%; display:flex; justify-content:center;">
                         <div style="max-width:800px;text-align: justify; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
                             <h1 style="text-align:center ; color:#088178">PRE CHECK OUT ALERT !</h1>
@@ -52,22 +65,22 @@ export async function sendPreAlertMail(date) {
                         </div>
                     </div>
                         `
-                };
-                sendEmail(mailOptions);
+            };
+            sendEmail(mailOptions);
         });
     }
 }
 
 export async function sendCheckOutMail(date) {
-    const bookings = await Booking.find({ toDate: date, status : "booked" });
+    const bookings = await Booking.find({ toDate: date, status: "booked" });
     if (bookings.length > 0) {
         bookings.forEach(async (booking) => {
-                booking.status = "checked out";
-                let mailOptions = {
-                    from: process.env.myEmail,
-                    to: booking.userEmail,
-                    subject: 'CHECK OUT CONFIRMATION FROM THE HIMALAYAN HOTEL',
-                    html: `
+            booking.status = "checked out";
+            let mailOptions = {
+                from: process.env.myEmail,
+                to: booking.userEmail,
+                subject: 'CHECK OUT CONFIRMATION FROM THE HIMALAYAN HOTEL',
+                html: `
                     <div style="width:100%; display:flex; justify-content:center;">
                         <div style="max-width:800px;text-align: justify; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
                             <h1 style="text-align:center ; color:#088178">CHECK OUT CONFIRMATION !</h1>
@@ -88,59 +101,288 @@ export async function sendCheckOutMail(date) {
                         </div>
                     </div>
                         `
-                };
-                sendEmail(mailOptions);
-                await booking.save();
+            };
+            sendEmail(mailOptions);
+            await booking.save();
         })
     }
 }
 
-export async function roomBookingMail(roomName, user, fromDate, toDate) {
+export async function roomBookingMail(room, user, fromDate, toDate, booking, amount, members) {
     let mailOptions = {
         from: process.env.myEmail,
         to: user?.email,
         subject: 'BOOKING CONFIRMATION FROM THE HIMALAYAN HOTEL',
         html: `
-        <div style="max-width:800px;text-align:justify;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif"><div class="adM">
-                </div><h1 style="text-align:center;color:#088178">ROOM BOOKED SUCCESSFULLY !</h1>
-                <h3>Hi,<span style="color:#088178">${user?.name}</span></h3>
-                <p style="color:#414141">
-                    Thanks for choosing us!<br><br>
-                    Just wanted to give you a confirmation that <span style="font-weight:bolder;color:#088178">your
-                    booking for ${roomName} from ${fromDate} to ${toDate} has been successfully done.</span> We're here to
-                    make your stay enjoyable. If you have any specific needs or requests for your stay, feel free to
-                    let us know we are always at your service.
-                    We're grateful for your stay and want to ensure that your stay will be very smooth and enjoyable. If
-                    there's anything we can do to assist you, please don't hesitate to reach out us.
-                    <br><br> Looking forward to make your check-in effortless!</p>
-                <h4>Welcome to <a href=${client} style="color:#088178;text-decoration:none" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://hotel.rohitweb.tech&amp;source=gmail&amp;ust=1704270815561000&amp;usg=AOvVaw0dFCqzeb-cjn09mBU-Nq9q">THE HIMALAYAN HOTEL.</a></h4>
-                <a href="${client}/profile/booking" target="_blank" data-saferedirecturl="https://www.google.com/url?q=${client}/profile/bookings&amp;source=gmail&amp;ust=1704270815561000&amp;usg=AOvVaw3OmZvcapVcpCnTtDKUQPny"><button style="border:none;padding:5px 10px;margin-top:20px;color:white;font-size:14px;background:#088178">
-                    Click Here For More Information
-                </button></a><div class="yj6qo"></div><div class="adL"> 
-            </div></div>
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; padding: 20px;">
+            <tr>
+                <td align="center">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                        <!-- Header Section -->
+                        <tr>
+                            <td style="background-color: rgb(17, 24, 39); color: #ffffff; text-align: center; padding: 20px;">
+                                <h1 style="margin: 0; font-size: 24px; font-weight: bold;">Booking Confirmation</h1>
+                                <p style="margin: 5px 0 0; font-size: 16px;">Thank you for choosing <The href="${process?.env?.CLIENT_URI}" style="color : white; text-decoration: none;">The Himalayan Hotel</a></p>
+                            </td>
+                        </tr>
+                        <!-- Content Section -->
+                        <tr>
+                            <td style="padding: 20px;">
+                                <p style="font-size: 16px; color: #333333; margin: 0;">Dear <strong> ${user?.name || "guest"}</strong>,</p>
+                                <p style="font-size: 14px; color: #555555; margin: 10px 0;">
+                                    Your booking for <strong>${room?.roomName || "Room"}</strong> has been successfully confirmed. Below are the details of your booking:
+                                </p>
+                                <!-- Booking Details -->
+                                <table width="100%" style="font-size: 14px; color: #555555; margin-top: 20px; border-spacing: 0;">
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Booking ID:</strong></td>
+                                        <td style="padding: 5px 0;">${booking?._id}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Check-in:</strong></td>
+                                        <td style="padding: 5px 0;">${makeDateTimeReadable(fromDate)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Check-out:</strong></td>
+                                        <td style="padding: 5px 0;">${makeDateTimeReadable(toDate)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Guests:</strong></td>
+                                        <td style="padding: 5px 0;">${members?.length} (${members?.map(member => member?.name)})</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Payment Mode:</strong></td>
+                                        <td style="padding: 5px 0;">${booking?.paymentMode}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Total Amount:</strong></td>
+                                        <td style="padding: 5px 0;">₹${booking?.paymentMode === "cash" ? (amount).toFixed(2) : (amount / 100).toFixed(2)}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- Image Section -->
+                        <tr>
+                            <td style="padding: 0;">
+                                <img src=${room?.imageUrl} alt=${room?.roomName} style="width: 100%; height: auto; display: block;" />
+                            </td>
+                        </tr>
+                        <!-- Room Details Section -->
+                        <tr>
+                            <td style="padding: 20px;">
+                                <h2 style="font-size: 18px; color: rgb(17, 24, 39); margin: 0;">Room Details</h2>
+                                <p style="font-size: 14px; color: #555555; margin: 5px 0;">${room?.roomName || "Room"}</p>
+                            </td>
+                        </tr>
+                        <!-- Footer Section -->
+                        <tr>
+                            <td style="padding: 20px; background-color: #f8f9fa; text-align: center;">
+                                <p style="font-size: 12px; color: #777777; margin: 0;">For any queries, contact us at <a href="mailto:${process?.env?.myEmail}" style="color: rgb(17, 24, 39); text-decoration: none;">${process?.env?.myEmail}</a> or call us at ${process?.env?.toNumber}.</p>
+                                <p style="font-size: 12px; color: #777777; margin: 5px 0 0;">We look forward to hosting you!</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
             `
-    };
+    }
+
     let adminMailOptions = {
         from: process.env.myEmail,
         to: process.env.myEmail,
-        subject: 'New Room Booking',
+        subject: `New Booking for ${room.roomName || "Room"}`,
         html: `
-        <div style="max-width:800px;text-align:justify;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif"><div class="adM">
-            </div><h1 style="text-align:center;color:#088178">New Room Booking !</h1>
-                <h3>Hi,<span style="color:#088178">Admin</span></h3>
-                <p style="color:#414141">
-                    Just wanted to give you an alert that just got a <span style="font-weight:bolder;color:#088178">
-                    booking for ${roomName} from ${fromDate} to ${toDate} by ${user?.name}(${user?.email}).</span> 
-                </p>
-            </div>
-        </div>
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; padding: 20px;">
+            <tr>
+                <td align="center">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                        <!-- Header Section -->
+                        <tr>
+                            <td style="background-color: rgb(17, 24, 39); color: #ffffff; text-align: center; padding: 20px;">
+                                <h1 style="margin: 0; font-size: 24px; font-weight: bold;">New Booking Recieved !</h1>
+                                <p style="margin: 5px 0 0; font-size: 16px;">${room.roomName || "Room"}</p>
+                            </td>
+                        </tr>
+                        <!-- Content Section -->
+                        <tr>
+                            <td style="padding: 20px;">
+                                <p style="font-size: 16px; color: #333333; margin: 0;">Dear <strong> admin</strong>,</p>
+                                <p style="font-size: 14px; color: #555555; margin: 10px 0;">
+                                     New booking recieved for <strong>${room?.roomName || "Room"}</strong> from ${user?.name}(${user?.email}). Below are the details of your booking:
+                                </p>
+                                <!-- Booking Details -->
+                                <table width="100%" style="font-size: 14px; color: #555555; margin-top: 20px; border-spacing: 0;">
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Booking ID:</strong></td>
+                                        <td style="padding: 5px 0;">${booking?._id}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Check-in:</strong></td>
+                                        <td style="padding: 5px 0;">${makeDateTimeReadable(fromDate)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Check-out:</strong></td>
+                                        <td style="padding: 5px 0;">${makeDateTimeReadable(toDate)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Guests:</strong></td>
+                                        <td style="padding: 5px 0;">${members?.length} (${members?.map(member => member?.name)})</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Payment Mode:</strong></td>
+                                        <td style="padding: 5px 0;">${booking?.paymentMode}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong>Total Amount:</strong></td>
+                                        <td style="padding: 5px 0;">₹${booking?.paymentMode === "cash" ? (amount).toFixed(2) : (amount / 100).toFixed(2)}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- Image Section -->
+                        <tr>
+                            <td style="padding: 0;">
+                                <img src=${room?.imageUrl} alt=${room?.roomName} style="width: 100%; height: auto; display: block;" />
+                            </td>
+                        </tr>
+                        <!-- Room Details Section -->
+                        <tr>
+                            <td style="padding: 20px;">
+                                <h2 style="font-size: 18px; color: rgb(17, 24, 39); margin: 0;">Room Details</h2>
+                                <p style="font-size: 14px; color: #555555; margin: 5px 0;">${room?.roomName || "Room"}</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
             `
     }
+
     sendEmail(mailOptions);
     sendEmail(adminMailOptions);
 }
 
-export async function bookingCancelMail(booking,user,roomName) {
+export async function checkInOtpMail(user, OTP) {
+    let mailOptions = {
+        from: process.env.myEmail,
+        to: user?.email,
+        subject: 'CHECK IN OTP FROM THE HIMALAYAN HOTEL',
+        html: `
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; padding: 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 500px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color: rgb(17, 24, 39); color: #ffffff; text-align: center; padding: 20px;">
+              <h1 style="margin: 0; font-size: 24px;">Your Check-In OTP</h1>
+              <p style="margin: 5px 0 0; font-size: 14px;">The Himalayan Hotel</p>
+            </td>
+          </tr>
+
+          <!-- OTP Content -->
+          <tr>
+            <td style="padding: 30px 20px; text-align: center;">
+              <p style="font-size: 16px; color: #333333; margin: 0 0 10px;">Hello <strong>${user?.name || "Guest"}</strong>,</p>
+              <p style="font-size: 14px; color: #555555; margin: 0 0 20px;">
+                Use the OTP below to complete your check-in:
+              </p>
+
+              <div style="font-size: 36px; font-weight: bold; color: rgb(17, 24, 39); margin: 20px 0;">
+                ${OTP}
+              </div>
+
+              <p style="font-size: 14px; color: #777777; margin: 0;">
+                This OTP is valid for a limited time. Please do not share it with anyone.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 15px; background-color: #f8f9fa; text-align: center;">
+              <p style="font-size: 12px; color: #777777; margin: 0;">
+                Need help? Email us at <a href="mailto:${process?.env?.myEmail}" style="color: rgb(17, 24, 39); text-decoration: none;">${process?.env?.myEmail}</a> or call ${process?.env?.toNumber}.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+            `
+    }
+
+    sendEmail(mailOptions);
+}
+
+export async function checkOutOtpMail(user, OTP) {
+    let mailOptions = {
+        from: process.env.myEmail,
+        to: user?.email,
+        subject: 'CHECK OUT OTP FROM THE HIMALAYAN HOTEL',
+        html: `
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; padding: 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 500px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color: rgb(17, 24, 39); color: #ffffff; text-align: center; padding: 20px;">
+              <h1 style="margin: 0; font-size: 24px;">Your Check-In OTP</h1>
+              <p style="margin: 5px 0 0; font-size: 14px;">The Himalayan Hotel</p>
+            </td>
+          </tr>
+
+          <!-- OTP Content -->
+          <tr>
+            <td style="padding: 30px 20px; text-align: center;">
+              <p style="font-size: 16px; color: #333333; margin: 0 0 10px;">Hello <strong>${user?.name || "Guest"}</strong>,</p>
+              <p style="font-size: 14px; color: #555555; margin: 0 0 20px;">
+                Use the OTP below to complete your check-out:
+              </p>
+
+              <div style="font-size: 36px; font-weight: bold; color: rgb(17, 24, 39); margin: 20px 0;">
+                ${OTP}
+              </div>
+
+              <p style="font-size: 14px; color: #777777; margin: 0;">
+                This OTP is valid for a limited time. Please do not share it with anyone.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 15px; background-color: #f8f9fa; text-align: center;">
+              <p style="font-size: 12px; color: #777777; margin: 0;">
+                Need help? Email us at <a href="mailto:${process?.env?.myEmail}" style="color: rgb(17, 24, 39); text-decoration: none;">${process?.env?.myEmail}</a> or call ${process?.env?.toNumber}.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
+            `
+    }
+
+    sendEmail(mailOptions);
+}
+
+export async function bookingCancelMail(booking, user, roomName) {
     let mailOptions = {
         from: process.env.myEmail,
         to: user?.email,
@@ -201,7 +443,7 @@ export async function sendQueryMail(name, email, contact, message) {
     sendEmail(mailOptions);
 }
 
-export async function sendEmailVerificationMail(name, email, token){
+export async function sendEmailVerificationMail(name, email, token) {
     let mailOptions = {
         from: process.env.myEmail,
         to: email,

@@ -9,6 +9,7 @@ import { IoTime } from "react-icons/io5";
 import { MdEmail } from "react-icons/md";
 
 export default function Location({data}) {
+  const SERVER_URL = import.meta.env.VITE_BASE_URL ;
   return (
     <div id="element-card" className="flex-box justify-center aling-center text-[--primary-color]">
             <div className='element-card'>
@@ -21,7 +22,7 @@ export default function Location({data}) {
                     <p className='flex items-center gap-1'><IoTime/> 24 X 7 Open</p>
                 </div>
                 <div className="image flex-box justify-center align-center bg-gray-600">
-                <Img src={data?.imageUrl || image}/>
+                <Img src={SERVER_URL + data?.imageUrl || image}/>
                 </div>
             </div>
         </div>

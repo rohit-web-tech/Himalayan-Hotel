@@ -12,10 +12,19 @@ export const getAbout = asyncHandler(async (_, res) => {
 })
 
 export const setAbout = asyncHandler(async (req, res) => {
-    const { title, imageUrl, description } = req.body;
+    const {  title, image, description } = req.body;
+    const newImage = req?.file ;
+
+    if(!title || !description || (!newImage && !image)) {
+        throw new ApiError(400,"All fields are required !")
+    }
+
     await About.deleteMany({});
-    const about = new About({ title, imageUrl, description });
+
+    const about = new About({ title, imageUrl : newImage?.filename ? newImage.filename : image, description });
+
     await about.save();
+
     res
     .status(201)
     .json(

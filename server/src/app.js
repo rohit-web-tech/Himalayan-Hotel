@@ -4,6 +4,16 @@ import cors from "cors" ;
 import cookieParser from "cookie-parser" ;
 import cron from "node-cron";
 import {rateLimit} from "express-rate-limit";
+import path from 'path';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the current file's path
+const __filename = fileURLToPath(import.meta.url);
+// Get the directory name
+const __dirname = dirname(__filename);  
+
+
 const app = express() ;
 const limiter  = rateLimit({
     windowMs :  15 * 60 * 1000,
@@ -20,6 +30,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(limiter);
+app.use(express.static(path.join(__dirname, '../public')));
 
 // node-cron 
 cron.schedule('* * * * *', () => {

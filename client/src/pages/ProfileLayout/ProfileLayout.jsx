@@ -84,7 +84,7 @@ const ProfileLayout = () => {
                                     <button onClick={handleLogOut} className='bg-red-600 text-white p-2 px-8 rounded-lg hover:bg-red-800'>Log Out</button>
                                 </div>
                                 <Routes>
-                                    <Route path="/" element={<ProfileLandingPage />} />
+                                    <Route path="/" element={<ProfileLandingPage handleLogOut={handleLogOut} />} />
                                     <Route path="/bookings" element={<MyOrders />} />
                                     <Route path="/user" element={<UserProfile />} />
                                 </Routes>

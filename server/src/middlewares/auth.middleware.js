@@ -22,19 +22,20 @@ const auth = asyncHandler(async(req,_,next)=>{
     if(!user){
         throw new ApiError(401,"Unauthorized request !!");
     }
-
+    
     req.user = user ;
-
+    
     next();
 })
 
 const adminAuth = asyncHandler(async(req,_,next)=>{
+    
     const user = req.user ;
-
-    if(!user || !user.isAdmin){
+    
+    if(!user || !user?.isAdmin){
         throw new ApiError(401,"Unauthorized request !!");
     }
-
+    
     next();
 })
 

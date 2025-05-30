@@ -12,10 +12,20 @@ export const getContact = asyncHandler(async (_, res) => {
 })
 
 export const setContact = asyncHandler(async (req, res) => {
-    const {contact, email , address,imageUrl} = req.body;
+    
+    const {  contact, email , address,image } = req.body;
+    const newImage = req?.file ;
+
+    if(!contact || !email || !address || (!newImage && !image)) {
+        throw new ApiError(400,"All fields are required !")
+    }
+
     await Contact.deleteMany({});
-    const contactDetails = new Contact({contact, email , address,imageUrl});
+
+    const contactDetails = new Contact({contact, email , address,imageUrl : newImage?.filename ? newImage.filename : image,});
+
     await contactDetails.save();
+
     res
     .status(201)
     .json(

@@ -49,10 +49,14 @@ const bookingSchema = mongoose.Schema({
         Enum : ["prepaid" , "cash"],
         require : true
     },
+    OTP : {
+        type : String ,
+        length : 6
+    },
     status: {
         type: String,
         require: true,
-        Enum: ["booked", "cancelled", "checked out"],
+        Enum: ["Booked", "Cancelled", "Checked Out","Checked In"],
         default: "booked"
     }
 }, {

@@ -9,6 +9,7 @@ import ApiResponse from "../lib/apiResponse.js";
 export const registerUser = asyncHandler(async (req, res) => {
 
     const { name, email, password, contactNumber } = req.body;
+    const image = req?.file ;
 
     if (!name || !email || !password || !contactNumber) {
         throw new ApiError(400, "All fields are required!!");
@@ -23,7 +24,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User already exist with same email !!");
     }
 
-    const newUser = await User.create({ name, email, password, contactNumber });
+    const newUser = await User.create({ name, email, password, contactNumber, image : image?.filename });
 
     const [token, tokenExpiry] = await generateToken();
 
@@ -39,7 +40,7 @@ export const registerUser = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 201,
-                {},
+                newUser,
                 "User created successfully!!",
             )
         )
@@ -49,8 +50,9 @@ export const registerUser = asyncHandler(async (req, res) => {
 export const registerAdmin = asyncHandler(async (req, res) => {
 
     const { name, email, password, contactNumber } = req.body;
+    const image = req?.file ;
 
-    if (!name || !email || !password || !contactNumber) {
+    if (!name || !email || !password || !contactNumber || !image) {
         throw new ApiError(400, "All fields are required!!");
     }
 
@@ -63,7 +65,7 @@ export const registerAdmin = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User already exist with same email !!");
     }
 
-    const newUser = await User.create({ name, email, password, contactNumber, isVerified: true, isAdmin: true });
+    const newUser = await User.create({ name, email, password, contactNumber, isVerified: true, isAdmin: true, image : image?.filename });
 
     await newUser.save();
 
@@ -179,8 +181,9 @@ export const loginAdmin = asyncHandler(async (req, res) => {
     if (!admin) {
         throw new ApiError(400, "Please login with right credentials!!");
     }
-
+    
     const isPasswordCorrect = await admin.isCorrectPassword(password);
+
 
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Please login with right credentials!!");
@@ -190,6 +193,8 @@ export const loginAdmin = asyncHandler(async (req, res) => {
 
     admin.refreshToken = RefreshToken;
 
+    const newAdmin = await User?.findById(admin?._id).lean();
+
     res
         .status(200)
         .cookie("AccessToken", AccessToken, options)
@@ -197,7 +202,7 @@ export const loginAdmin = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                { admin, AccessToken, RefreshToken },
+                { ...newAdmin , AccessToken, RefreshToken },
                 "You are logged in successfully!!"
             )
         )
@@ -208,7 +213,9 @@ export const getAllUsers = asyncHandler(async (_, res) => {
 
     const users = await User.find(
         {
-            isVerified: true
+            isVerified: true,
+            isAdmin: false,
+            isPrimary : false
         }
     ).select("-emailVerificationTokenExpiry -emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
 
@@ -228,7 +235,8 @@ export const getAllAdmins = asyncHandler(async (_, res) => {
 
     const admins = await User.find(
         {
-            isAdmin: true
+            isAdmin: true,
+            isPrimary: false
         }
     ).select("-emailVerificationTokenExpiry -emailVerificationToken -forgetPasswordToken -forgetPasswordTokenExpiry");
 
@@ -321,11 +329,16 @@ export const deleteUser = asyncHandler(async (req, res) => {
 
 export const editUser = asyncHandler(async (req, res) => {
 
-    const { name, email, password, contactNumber, userId } = req.body;
+    const { name, email, password, contactNumber, image, userId } = req.body;
+    const UpdatedImage = req?.file ;
 
-    if (!name || !email || !password || !contactNumber) {
+    console.log(UpdatedImage,image);
+
+    if (!name || !email || !password || !contactNumber || (!image && !UpdatedImage)) {
         throw new ApiError(400, "All fields are required!!");
     }
+
+    const imageUrl = UpdatedImage ? UpdatedImage?.filename : image ;
 
     if (!userId) {
         throw new ApiError(400, "UserId is required !!")
@@ -348,7 +361,8 @@ export const editUser = asyncHandler(async (req, res) => {
                 name,
                 email,
                 password,
-                contactNumber
+                contactNumber,
+                image : imageUrl
             }
         }
     );
@@ -362,6 +376,44 @@ export const editUser = asyncHandler(async (req, res) => {
                 200,
                 allUsers,
                 "User's details updated successfully !!"
+            )
+        )
+
+});
+
+export const updateUserDetails = asyncHandler(async (req, res) => {
+
+    const { name, contactNumber, email } = req.body;
+    const {_id : userId} = req?.user ;
+
+    if (!name || !contactNumber) {
+        throw new ApiError(400, "All fields are required!!");
+    }
+
+    if (!userId) {
+        throw new ApiError(400, "UserId is required !!")
+    }
+
+    const updatedProfile = await User.findByIdAndUpdate(
+        userId,
+        {
+            $set: {
+                name,
+                contactNumber
+            }
+        },
+        {
+            new : true
+        }
+    ).select("name email contactNumber _id isAdmin isVerified");
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                updatedProfile,
+                "Your details updated successfully !!"
             )
         )
 

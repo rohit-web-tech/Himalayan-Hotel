@@ -6,9 +6,10 @@ import ContentWrapper from "../../components/contentWrapper/ContentWrapper";
 import { FaArrowLeft } from "react-icons/fa6";
 import Modal from "../../components/modal/Modal";
 import { message } from "antd";
+import { makeDateTimeReadable } from "../../lib/CommonFunctions";
 
 const BookingDetails = () => {
-
+    const SERVER_URL = import.meta.env.VITE_BASE_URL ;
     const [members, setMembers] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
     const [booking, setBooking] = useState({});
@@ -46,9 +47,8 @@ const BookingDetails = () => {
         setMembers(res?.data[0]?.members);
     }
 
-    const cancelBooking = (booking) => {
-        console.log(booking)
-        if (booking?.status == "booked") {
+    const cancelBooking = () => {
+        if (booking?.status == "Booked") {
             fetchData(`/booking/cancel`, setModalLoading, "DELETE", { bookingId: booking?._id })
                 .then(res => {
                     message.success("Booking cancelled successfully!!")
@@ -59,8 +59,7 @@ const BookingDetails = () => {
     }
 
     const handleCancelBooking = () => {
-        console.log(booking?.status)
-        if (booking?.status !== "booked") return;
+        if (booking?.status !== "Booked") return;
         setModalData(() => (
             {
                 title: "Are you sure you want to cancel booking?",
@@ -87,8 +86,42 @@ const BookingDetails = () => {
         setMembers(updatedMembers);
     };
 
-    const handleSaveChanges = () => {
-        setIsEditing(false);
+    const handleSaveChanges = async () => {
+        if (booking?.status !== "Booked") return;
+        for (let i = 0; i < members?.length; i++) {
+            const member = members[i];
+            if (!member?._id || !member?.name || !member?.age || !member?.adhaar || isNaN(member?.adhaar) || member?.adhaar?.length !== 12) {
+                return message.warning("All fields are required and Adhaar number should be 12 digit !!");
+            }
+        }
+        setModalData(() => (
+            {
+                title: "Are you sure you want to update member's details?",
+                desc: `This action will update the details of members . Are you sure you want to update details of member(s) for ${booking?.room?.roomName}?`,
+                confirmText: "Confirm",
+                cancelText: "Back",
+                confirmHandler: () => {
+                    handleMembersUpdate();
+                }
+            }
+        ));
+        setShowModal(true);
+    };
+
+    const handleMembersUpdate = async () => {
+        try {
+            const res = await fetchData(`/booking/member`, setModalLoading, "PATCH", members);
+            if (!res?.success) {
+                return message.warning(res?.message || "Something went wrong while updating details !!");
+            }
+            message.success(res?.message || "Member's details updated successfully !!");
+            setIsEditing(false);
+            getBookingDetails();
+        } catch (error) {
+            message.warning(res?.message || "Something went wrong while updating details !!");
+        } finally {
+            setShowModal(false);
+        }
     };
 
     return (
@@ -130,7 +163,7 @@ const BookingDetails = () => {
                                         <h2 className="text-2xl font-semibold text-gray-900">{booking?.room?.roomName || "Room"}</h2>
                                     </div>
                                     <img
-                                        src={booking?.room?.imageUrl}
+                                        src={SERVER_URL + booking?.room?.imageUrl}
                                         alt={booking?.room?.roomName}
                                         className="w-full h-64 rounded-lg object-cover mb-6"
                                     />
@@ -152,8 +185,13 @@ const BookingDetails = () => {
                                         <p className="text-sm text-gray-500">
                                             Number of Room(s): <span className="font-medium">{booking?.quantity}</span>
                                         </p>
+
+                                        <p className="text-sm text-gray-500">
+                                            Booked On:{" "}
+                                            <span className="font-medium">{makeDateTimeReadable(booking?.createdAt)}</span>
+                                        </p>
                                         <p
-                                            className={`text-sm font-medium ${booking?.status === "cancelled" ? "text-red-600" : "text-green-600"
+                                            className={`text-sm font-medium ${booking?.status === "Cancelled" ? "text-red-600" : booking?.status === "Booked" ? "text-green-600" : booking?.status === "Checked In" ? "text-yellow-600" : "text-orange-600"
                                                 }`}
                                         >
                                             Status: {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
@@ -276,7 +314,7 @@ const BookingDetails = () => {
                                     </div>
 
                                     <div className="flex items-center justify-between">
-                                        {!isEditing && booking?.status === "booked" && (
+                                        {!isEditing && booking?.status === "Booked" && (
                                             <button
                                                 onClick={() => setIsEditing(true)}
                                                 className="bg-[--primary-color] text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-black focus:ring focus:ring-gray-300 transition"
@@ -285,7 +323,7 @@ const BookingDetails = () => {
                                             </button>
                                         )}
                                         {
-                                            booking?.status === "booked" && (
+                                            booking?.status === "Booked" && (
                                                 <button
                                                     onClick={handleCancelBooking}
                                                     className="bg-red-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-700 focus:ring focus:ring-red-300 transition"

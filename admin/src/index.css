@@ -1,3 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+* {
+  font-family: 'Poppins', 'poppins', 'Inter', 'inter';
+  scroll-behavior: smooth;
+}
+
+@import "tailwindcss";
+
+@theme {
+  --color-main-bg: #FAFBFB;
+  --color-secondary-bg: #f2f2f2;
+  --color-half-transparent: rgba(0, 0, 0, 0.5);
+  --color-btn-bg: #16a34a;
+  --color-btn-light-bg: #22c55e;
+  --color-main-text: #000;
+  --color-secondary-text: #444;
+  --color-gray: #9ca3af;
+  --color-blue: #5454ff;
+  --color-hover : #eee ;
+  --color-border : #e1e1e1 ;
+}
+
+@layer base {
+  [data-theme="dark"] {
+    --color-main-bg: #101828;
+    --color-secondary-bg: #1e2939;
+    --color-main-text: #fff;
+    --color-secondary-text: #ddd;
+    --color-hover : #0e0c1a ;
+    --color-border : #2c2c2c ;
+  }
+}

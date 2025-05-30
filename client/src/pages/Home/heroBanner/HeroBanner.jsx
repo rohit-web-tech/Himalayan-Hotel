@@ -2,12 +2,12 @@ import herobanner from "../../../assets/herobanner.jpg";
 import { useNavigate } from "react-router-dom";
 import ContentWrapper from "../../../components/contentWrapper/ContentWrapper";
 const HeroBanner = ({data}) => {
-  console.log(data?.imageUrl);
+  const SERVER_URL = import.meta.env.VITE_BASE_URL ;
   const navigate = useNavigate();
   return (
     <div className="h-[500px] relative w-full flex justify-center items-center bg-gray-700">
       <img
-        src={data?.imageUrl || herobanner}
+        src={SERVER_URL + data?.imageUrl || herobanner}
         className="h-[500px] w-screen object-cover opactiy opacity-40"
       />
       <div className="absolute w-full">

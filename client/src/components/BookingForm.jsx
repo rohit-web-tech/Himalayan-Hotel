@@ -9,6 +9,7 @@ import { message } from "antd";
 import { fetchData, fetchGetData } from "../lib/fetchData";
 
 const RoomBookingPage = () => {
+  const SERVER_URL = import.meta.env.VITE_BASE_URL ;
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
@@ -94,7 +95,7 @@ const RoomBookingPage = () => {
           "contact": contact
         },
         "handler": async function (response) {
-          const res = await fetchData('/booking/prepaid/verify', () => { }, "POST", { response, from: fromDate, to: toDate, room: id, quantity: Number(numRooms), members });
+          const res = await fetchData('/booking/prepaid/verify', setLoading, "POST", { response, from: fromDate, to: toDate, room: id, quantity: Number(numRooms), members });
           if (res?.success) {
             message.success("Room booked successfully!!");
             navigate(`/booking/confirmation?id=${res?.data?._id}`);
@@ -182,7 +183,7 @@ const RoomBookingPage = () => {
                   {/* Room Image and Information */}
                   <div className="mb-4">
                     <img
-                      src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/21/b4/93/9d/panoramic-room.jpg?w=1200&h=-1&s=1"
+                      src={SERVER_URL + room?.imageUrl}
                       alt="Premium Room"
                       className="object-cover w-full h-60 rounded-lg"
                     />

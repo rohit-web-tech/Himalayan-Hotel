@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Room = (props) => {
+    const SERVER_URL = import.meta.env.VITE_BASE_URL ;
     const [showDetails, setShowDetails] = useState(false);
     const navigate = useNavigate();
     const handleBook = (roomId) => {
@@ -22,7 +23,7 @@ const Room = (props) => {
     return (
         <div id="room-container">
             <div className="room-image">
-                <Img src={props?.room?.imageUrl} />
+                <Img src={SERVER_URL + props?.room?.imageUrl} />
             </div>
             <div className="room-description">
                 <div className="room-name">

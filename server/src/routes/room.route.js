@@ -12,12 +12,13 @@ import {
     adminAuth,
     auth
 } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 const router = express.Router();
 
 router.route("/")
     .get(auth, getRooms)
-    .post(auth, adminAuth, addRoom)
-    .patch(auth, adminAuth, editRoom)
+    .post(auth, adminAuth, upload.single("image"), addRoom)
+    .patch(auth, adminAuth, upload.single("image"), editRoom)
     .delete(auth, adminAuth, deleteRoom);
 
 router.route("/:id")

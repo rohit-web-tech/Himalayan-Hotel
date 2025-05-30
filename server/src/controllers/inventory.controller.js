@@ -5,14 +5,19 @@ import { Inventory, Item } from "../models/inventory.model.js";
 
 export const AddInventory = asyncHandler(async (req, res) => {
 
-    const { name } = req?.body;
+    const { name, price } = req?.body;
+    const image = req?.file;
 
-    if (!name) {
-        throw new ApiError(400, "Inventory name is required !!");
+    console.log(name, image, price)
+
+    if (!name || !price || !image) {
+        throw new ApiError(400, "All fields are required !!");
     }
 
     const newInventory = await Item.create({
-        name
+        name,
+        price,
+        image: image?.filename
     });
 
     await newInventory.save();
@@ -27,9 +32,10 @@ export const AddInventory = asyncHandler(async (req, res) => {
 
 export const EditInventory = asyncHandler(async (req, res) => {
 
-    const { newName, _id } = req?.body;
+    const { newName, _id, price, image } = req?.body;
+    const updatedImage = req?.file;
 
-    if (!newName || !_id) {
+    if (!newName || !_id || !price || (!image && !updatedImage)) {
         throw new ApiError(400, "All fields are required !!");
     }
 
@@ -37,7 +43,9 @@ export const EditInventory = asyncHandler(async (req, res) => {
         _id,
         {
             $set: {
-                name: newName
+                name: newName,
+                price,
+                image: updatedImage ? updatedImage.filename : image
             }
         },
         {
@@ -96,35 +104,54 @@ export const fetchAllInventories = asyncHandler(async (req, res) => {
                 from: "rooms",
                 localField: "room",
                 foreignField: "_id",
-                as: "roomDetails",
-            },
+                as: "roomDetails"
+            }
         },
         {
-            $unwind: "$roomDetails",
+            $unwind: "$roomDetails"
         },
         {
             $group: {
                 _id: "$item",
-                totalQuantity: { $sum: { $multiply: ["$quantity", "$roomDetails.totalRooms"] } },
-            },
+                totalQuantity: {
+                    $sum: {
+                        $multiply: ["$quantity", "$roomDetails.totalRooms"]
+                    }
+                }
+            }
         },
         {
             $lookup: {
                 from: "items",
                 localField: "_id",
                 foreignField: "_id",
-                as: "itemDetails",
-            },
+                as: "itemDetails"
+            }
+        },
+        {
+            $unwind: "$itemDetails"
+        },
+        {
+            $addFields: {
+                name: "$itemDetails.name",
+                image: "$itemDetails.image",
+                price: "$itemDetails.price",
+                totalPrice: { $multiply: ["$totalQuantity", "$itemDetails.price"] }
+            }
         },
         {
             $project: {
-                _id: 0,
-                item: { $arrayElemAt: ["$itemDetails", 0] },
+                _id: 1,
+                name: 1,
+                image: 1,
+                price: 1,
                 totalQuantity: 1,
-            },
-        },
+                totalPrice: 1
+            }
+        }
     ]);
-    
+
+
 
     return res
         .status(200)
@@ -219,14 +246,24 @@ export const getRoomInventory = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Room id is required !!");
     }
 
-    const inventories = await Inventory.find({
-        room : id
-    }).populate("item");
+    const inventories = await Inventory.find({ room: id })
+        .populate("item")
+        .lean(); 
+
+    const result = inventories.map(inv => {
+        return {
+            name: inv.item?.name,
+            image: inv.item?.image,
+            price: inv.item?.price,
+            quantity: inv.quantity,
+            _id: inv?._id,
+        }
+    })
 
     return res
         .status(200)
         .json(
-            new ApiResponse(200, inventories, "Inventories data is fetched successfully !!")
+            new ApiResponse(200, result, "Inventories data is fetched successfully !!")
         );
 
 })

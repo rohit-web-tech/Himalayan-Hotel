@@ -42,7 +42,7 @@ export default function ContactPage() {
         ) : (
           <>
             <Location data={data}/>
-            <ContactForm />
+            {/* <ContactForm /> */}
           </>
         )
       }
