@@ -131,11 +131,7 @@ export const bookRoom = asyncHandler(async (req, res) => {
         });
 
         await newBooking.save();
-<<<<<<< HEAD
         await roomBookingMail(room, req?.user, FromDate, ToDate, newBooking, req?.payment?.amount || amount, members);
-=======
-        await roomBookingMail(room, req?.user, FromDate, ToDate, newBooking,req?.payment?.amount || amount, members);
->>>>>>> 9888d1e3aaa57c16d4ebb8e09eaeab1393fda322
         res
             .status(201)
             .json(

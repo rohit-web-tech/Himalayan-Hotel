@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Wrapper from "../components/Wrapper";
 import Table from "../components/table/Table";
 import Heading from "../components/Heading";
@@ -92,6 +92,10 @@ const Earnings = () => {
     ];
 
     const [data, setData] = useState(initialData);
+
+    useEffect(()=>{
+        setData(initialData)
+    },[])
     const [searchTerm, setSearchTerm] = useState("");
     const [paymentFilter, setPaymentFilter] = useState("all");
 

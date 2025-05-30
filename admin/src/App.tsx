@@ -1,12 +1,12 @@
 import { FC, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useGlobalContext } from "./contexts/GlobalContext";
 import SettingsButton from "./components/SettingsButton";
 import Login from "./Pages/Login";
 import SettingsBar from "./components/SettingsBar";
 import "./App.css";
 import MainLayout from "./layouts/MainLayout";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { fetchGetData } from "./lib/fetchData";
 import { login, logout } from "./store/slice/user";
 import Loader from "./components/Loader";

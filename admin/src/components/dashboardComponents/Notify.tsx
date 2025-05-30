@@ -1,5 +1,5 @@
 import React from "react";
-import { LucideProps, MessageSquare } from "lucide-react";
+import { LucideProps } from "lucide-react";
 
 const Iconwithnotification = ({
   Icon,

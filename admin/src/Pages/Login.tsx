@@ -17,7 +17,6 @@ type ErrorMessage = {
 };
 
 const Login: FC = () => {
-  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate() ;
   const dispatch = useDispatch() ;
 
@@ -42,7 +41,7 @@ const Login: FC = () => {
       passworderror: "",
     });
 
-    const res = await fetchData("/user/adminLogin", setLoading, "POST", form);
+    const res = await fetchData("/user/adminLogin", ()=>{}, "POST", form);
       if (res?.success) {
         dispatch(login(res?.data));
         navigate("/");

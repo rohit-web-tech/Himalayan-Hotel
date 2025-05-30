@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { fetchData, fetchGetData } from '../lib/fetchData';
 import { useLocation } from 'react-router-dom';
 import { message } from 'antd';
 import Loader from '../components/Loader';
 import Heading from '../components/Heading';
-import Form from '../components/form/Form';
 import Table from '../components/table/Table';
 import ConfirmModal from '../components/ConfirmModal';
 import Wrapper from '../components/Wrapper';

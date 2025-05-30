@@ -22,7 +22,7 @@ const SettingsBar: FC = () => {
   } = useGlobalContext();
   const { theme, setTheme } = useTheme();
 
-  const handleCloseSideBar = (e: React.MouseEvent<HTMLElement>) => {
+  const handleCloseSideBar = () => {
     setShowSettingsBar(false);
   }
 

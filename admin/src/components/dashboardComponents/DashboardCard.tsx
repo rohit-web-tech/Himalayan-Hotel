@@ -1,6 +1,4 @@
-type dashboardcardProps = {
-  title: string;
-};
+
 
 
 

@@ -3,6 +3,7 @@ import Wrapper from "../components/Wrapper";
 import Table from "../components/table/Table";
 import Heading from "../components/Heading";
 import { DropdownItem } from "../components/Dropdown";
+import { column } from "../components/table/TableHeader";
 
 const Queries = () => {
     const initialData = [
@@ -32,7 +33,7 @@ const Queries = () => {
         }
     ];
 
-    const columns = [
+    const columns : column[] = [
         {
             label : 'Name',
             key : 'name'
@@ -52,8 +53,8 @@ const Queries = () => {
         {
             label : 'Status',
             key : 'status'
-        },
-        'Name', 'Email', 'Contact', 'Message', 'Status'];
+        }
+    ];
 
     const [data, setData] = useState(initialData);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);

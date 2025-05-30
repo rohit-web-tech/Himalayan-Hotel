@@ -383,11 +383,7 @@ export const editUser = asyncHandler(async (req, res) => {
 
 export const updateUserDetails = asyncHandler(async (req, res) => {
 
-<<<<<<< HEAD
     const { name, contactNumber, email } = req.body;
-=======
-    const { name, contactNumber } = req.body;
->>>>>>> 9888d1e3aaa57c16d4ebb8e09eaeab1393fda322
     const {_id : userId} = req?.user ;
 
     if (!name || !contactNumber) {

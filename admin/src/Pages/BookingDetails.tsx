@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, KeyRound, Loader as Loader2 } from "lucide-react";
 import Wrapper from "../components/Wrapper";
 import Loader from "../components/Loader";
@@ -236,7 +236,7 @@ const BookingDetails = () => {
 
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-main-text mb-2">Members</h3>
-                  {booking?.members?.map((member: any, index: number) => (
+                  {booking?.members?.map((member: any) => (
                     <div
                       key={member._id}
                       className="bg-secondary-bg p-4 rounded-lg mb-4 shadow-inner space-y-2"

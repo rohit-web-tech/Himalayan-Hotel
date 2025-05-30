@@ -1,6 +1,5 @@
 import { Check, Eye, EyeOff, X, LucideProps } from 'lucide-react';
 import { FC, useState, useId } from 'react';
-import { Mail } from "lucide-react";
 
 interface propsType {
   placeholder: string;
