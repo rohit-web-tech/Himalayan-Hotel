@@ -51,7 +51,7 @@ const MyOrders = () => {
                                         >
                                             <div className="flex flex-col md:flex-row items-start md:items-center">
                                                 <img
-                                                    src={SERVER_URL + booking?.room?.imageUrl}
+                                                    src={booking?.room?.imageUrl}
                                                     alt={booking?.room?.roomName}
                                                     className="w-full md:w-32 h-32 rounded-lg object-cover"
                                                 />
